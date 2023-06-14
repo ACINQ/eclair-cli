@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform") version "1.8.21"
+    kotlin("plugin.serialization") version "1.8.21"
 }
 
 group = "fr.acinq.lightning"
@@ -19,15 +20,31 @@ kotlin {
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
 
+    val nativeMain by sourceSets.getting {
+        dependencies {
+            implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.5")
+        }
+    }
+    val nativeTest by sourceSets.getting {
+        dependencies {
+            implementation(kotlin("test-common"))
+            implementation(kotlin("test-annotations-common"))
+        }
+    }
+
+    targets.all {
+        compilations.all {
+            kotlinOptions {
+                allWarningsAsErrors = true
+            }
+        }
+    }
+
     nativeTarget.apply {
         binaries {
             executable {
                 entryPoint = "main"
             }
         }
-    }
-    sourceSets {
-        val nativeMain by getting
-        val nativeTest by getting
     }
 }
