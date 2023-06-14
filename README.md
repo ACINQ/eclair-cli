@@ -1,4 +1,5 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-1.8.21-blue.svg?style=flat&logo=kotlin)](http://kotlinlang.org)
+![Github Actions](https://github.com/ACINQ/eclair-cli/actions/workflows/main.yml/badge.svg)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 # Eclair CLI
