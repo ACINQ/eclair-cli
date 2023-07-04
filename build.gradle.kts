@@ -22,6 +22,7 @@ kotlin {
 
     val nativeMain by sourceSets.getting {
         dependencies {
+            implementation("io.arrow-kt:arrow-core:1.2.0-RC")
             implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.5")
         }
     }
