@@ -4,7 +4,7 @@ import arrow.core.Either
 import kotlinx.cli.ArgType
 import kotlinx.cli.ExperimentalCli
 import kotlinx.cli.Subcommand
-import kotlinx.cli.*
+import kotlinx.cli.required
 
 @OptIn(ExperimentalCli::class)
 class HelloWorld() : Subcommand("say-hello", "Greet user") {

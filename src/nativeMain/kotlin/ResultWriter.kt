@@ -3,7 +3,7 @@ interface IResultWriter {
     fun writeError(message: String)
 }
 
-class ConsoleResultWriter: IResultWriter {
+class ConsoleResultWriter : IResultWriter {
     override fun writeSuccess(message: String) {
         println(message)
     }
