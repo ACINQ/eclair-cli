@@ -6,25 +6,23 @@ import kotlinx.cli.*
 import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalCli::class)
-class GetInfoCommand(
+class ConnectCommand(
     private val resultWriter: IResultWriter, private val eclairClient: IEclairClient
-) : Subcommand(
-    "getinfo",
-    "Get information about this instance such as version, features, nodeId and current block height as seen by the eclair."
-) {
+) : Subcommand("connect", "Connect to another lightning node") {
     private var password by option(
         ArgType.String, shortName = "p", description = "Password for the Eclair API"
     ).required()
     private var host by option(
         ArgType.String, shortName = "l", description = "Host URL for the Eclair API"
     ).default("http://localhost:8080")
+    private var uri by argument(ArgType.String, description = "The URI in format 'nodeId@host:port'")
 
     override fun execute() = runBlocking {
-        val infoResult = eclairClient.getInfo(password, host)
-        if (infoResult.isSuccess) {
-            resultWriter.writeSuccess(infoResult.getOrThrow())
+        val connectionResult = eclairClient.connect(password, host, uri)
+        if (connectionResult.isSuccess) {
+            resultWriter.writeSuccess(connectionResult.getOrThrow())
         } else {
-            resultWriter.writeError("Error fetching information: ${infoResult.exceptionOrNull()?.message}")
+            resultWriter.writeError("Error connecting to $uri: ${connectionResult.exceptionOrNull()?.message}")
         }
     }
 }

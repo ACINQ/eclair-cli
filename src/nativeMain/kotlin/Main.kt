@@ -1,5 +1,6 @@
 import commands.GetInfoCommand
 import commands.HelloWorld
+import commands.ConnectCommand
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ExperimentalCli
 
@@ -10,7 +11,8 @@ fun main(args: Array<String>) {
     val apiClient = EclairClient()
     parser.subcommands(
         HelloWorld(),
-        GetInfoCommand(resultWriter, apiClient)
+        GetInfoCommand(resultWriter, apiClient),
+        ConnectCommand(resultWriter, apiClient)
     )
     parser.parse(args)
 }
