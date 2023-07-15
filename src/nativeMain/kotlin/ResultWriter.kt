@@ -1,10 +1,10 @@
 interface IResultWriter {
-    fun writeSuccess(message: EclairInfo)
+    fun writeSuccess(message: String)
     fun writeError(message: String)
 }
 
 class ConsoleResultWriter: IResultWriter {
-    override fun writeSuccess(message: EclairInfo) {
+    override fun writeSuccess(message: String) {
         println("Success: $message")
     }
 
