@@ -1,6 +1,7 @@
 import commands.GetInfoCommand
 import commands.HelloWorld
 import commands.ConnectCommand
+import commands.DisconnectCommand
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ExperimentalCli
 
@@ -12,7 +13,8 @@ fun main(args: Array<String>) {
     parser.subcommands(
         HelloWorld(),
         GetInfoCommand(resultWriter, apiClient),
-        ConnectCommand(resultWriter, apiClient)
+        ConnectCommand(resultWriter, apiClient),
+        DisconnectCommand(resultWriter, apiClient)
     )
     parser.parse(args)
 }

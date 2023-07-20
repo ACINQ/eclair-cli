@@ -14,6 +14,7 @@ interface IEclairClient {
     suspend fun connectUri(password: String, host: String, uri: String): Result<String>
     suspend fun connectManual(password: String, host: String, nodeId: String, manualHost: String): Result<String>
     suspend fun connectNodeId(password: String, host: String, nodeId: String): Result<String>
+    suspend fun disconnect(password: String, host: String, nodeId: String): Result<String>
 }
 
 class EclairClient : IEclairClient {
@@ -75,8 +76,14 @@ class EclairClient : IEclairClient {
             httpClient.close()
         }
     }
+
     @OptIn(InternalAPI::class)
-    override suspend fun connectManual(password: String, host: String, nodeId: String, manualHost: String): Result<String> {
+    override suspend fun connectManual(
+        password: String,
+        host: String,
+        nodeId: String,
+        manualHost: String
+    ): Result<String> {
         val httpClient = HttpClient(CIO) {
             install(Auth) {
                 basic {
@@ -106,7 +113,9 @@ class EclairClient : IEclairClient {
         }.also {
             httpClient.close()
         }
-    }@OptIn(InternalAPI::class)
+    }
+
+    @OptIn(InternalAPI::class)
     override suspend fun connectNodeId(password: String, host: String, nodeId: String): Result<String> {
         val httpClient = HttpClient(CIO) {
             install(Auth) {
@@ -132,6 +141,36 @@ class EclairClient : IEclairClient {
                 throw Exception("Unauthorized: Incorrect password")
             } else {
                 throw Exception("Error connecting to $nodeId: ${e.message}")
+            }
+        }.also {
+            httpClient.close()
+        }
+    }
+
+    override suspend fun disconnect(password: String, host: String, nodeId: String): Result<String> {
+        val httpClient = HttpClient(CIO) {
+            install(Auth) {
+                basic {
+                    credentials {
+                        BasicAuthCredentials(username = "", password = password)
+                    }
+                }
+            }
+        }
+        return runCatching {
+            val response: HttpResponse = httpClient.post("$host/disconnect") {
+                parameter("nodeId", nodeId)
+            }
+            if (response.status == HttpStatusCode.OK) {
+                "Disconnected"
+            } else {
+                throw Exception("Failed to disconnect")
+            }
+        }.onFailure { e ->
+            if (e is ClientRequestException && e.response.status == HttpStatusCode.Unauthorized) {
+                throw Exception("Unauthorized: Incorrect password")
+            } else {
+                throw Exception("Error disconnecting: ${e.message}")
             }
         }.also {
             httpClient.close()
