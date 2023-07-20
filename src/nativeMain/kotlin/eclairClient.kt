@@ -57,7 +57,7 @@ class EclairClient : IEclairClient {
 
         return runCatching {
             val response: HttpResponse = httpClient.post("$host/connect") {
-                body = uri
+                parameter("uri", uri)
             }
             if (response.status == HttpStatusCode.OK) {
                 "Connected"
@@ -67,6 +67,8 @@ class EclairClient : IEclairClient {
         }.onFailure { e ->
             if (e is ClientRequestException && e.response.status == HttpStatusCode.Unauthorized) {
                 throw Exception("Unauthorized: Incorrect password")
+            } else {
+                throw Exception("Error connecting to $uri: ${e.message}")
             }
         }.also {
             httpClient.close()

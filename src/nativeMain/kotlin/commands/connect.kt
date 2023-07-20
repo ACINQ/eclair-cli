@@ -13,16 +13,16 @@ class ConnectCommand(
         ArgType.String, shortName = "p", description = "Password for the Eclair API"
     ).required()
     private var host by option(
-        ArgType.String, shortName = "l", description = "Host URL for the Eclair API"
+        ArgType.String, description = "Host URL for the Eclair API"
     ).default("http://localhost:8080")
     private var uri by argument(ArgType.String, description = "The URI in format 'nodeId@host:port'")
 
-    override fun execute() = runBlocking {
+    override fun execute(): Unit = runBlocking {
         val connectionResult = eclairClient.connect(password, host, uri)
-        if (connectionResult.isSuccess) {
-            resultWriter.writeSuccess(connectionResult.getOrThrow())
-        } else {
-            resultWriter.writeError("Error connecting to $uri: ${connectionResult.exceptionOrNull()?.message}")
+        connectionResult.onSuccess {
+            resultWriter.writeSuccess(it)
+        }.onFailure { e ->
+            resultWriter.writeError("Error connecting to $uri: ${e.message}")
         }
     }
 }
