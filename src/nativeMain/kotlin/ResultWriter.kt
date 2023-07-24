@@ -1,4 +1,5 @@
 import arrow.core.Either
+import types.ApiError
 
 interface IResultWriter {
     fun write(result: Either<ApiError, String>)

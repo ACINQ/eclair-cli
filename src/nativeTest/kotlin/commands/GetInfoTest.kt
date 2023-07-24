@@ -1,37 +1,52 @@
 package commands
 
-import ApiError
+import api.IEclairClientBuilder
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ExperimentalCli
+import kotlinx.serialization.json.Json
 import mocks.DummyEclairClient
 import mocks.DummyResultWriter
 import mocks.FailingEclairClient
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import types.ApiError
+import types.NodeInfo
+import kotlin.test.*
 
 @OptIn(ExperimentalCli::class)
 class GetInfoCommandTest {
-    @Test
-    fun `GetInfoCommand success`() {
+    private fun runTest(eclairClient: IEclairClientBuilder): DummyResultWriter {
         val resultWriter = DummyResultWriter()
-        val command = GetInfoCommand(resultWriter, DummyEclairClient())
+        val command = GetInfoCommand(resultWriter, eclairClient)
         val parser = ArgParser("test")
         parser.subcommands(command)
         parser.parse(arrayOf("getinfo", "-p", "password"))
-        assertNull(resultWriter.lastError)
-        assertEquals(DummyEclairClient.getInfoResponse, resultWriter.lastResult)
+        return resultWriter
     }
 
     @Test
-    fun `GetInfoCommand failure`() {
-        val resultWriter = DummyResultWriter()
+    fun `successful request`() {
+        val resultWriter = runTest(DummyEclairClient(getInfoResponse = DummyEclairClient.validGetInfoResponse))
+        assertNull(resultWriter.lastError)
+        assertNotNull(resultWriter.lastResult)
+        val format = Json { ignoreUnknownKeys = true }
+        assertEquals(
+            format.decodeFromString(NodeInfo.serializer(), DummyEclairClient.validGetInfoResponse),
+            format.decodeFromString(NodeInfo.serializer(), resultWriter.lastResult!!),
+        )
+    }
+
+    @Test
+    fun `api error`() {
         val error = ApiError(42, "test failure message")
-        val command = GetInfoCommand(resultWriter, FailingEclairClient(error))
-        val parser = ArgParser("test")
-        parser.subcommands(command)
-        parser.parse(arrayOf("getinfo", "-p", "password"))
+        val resultWriter = runTest(FailingEclairClient(error))
         assertNull(resultWriter.lastResult)
         assertEquals(error, resultWriter.lastError)
+    }
+
+    @Test
+    fun `serialization error`() {
+        val resultWriter = runTest(DummyEclairClient(getInfoResponse = DummyEclairClient.invalidGetInfoResponse))
+        assertNull(resultWriter.lastResult)
+        assertNotNull(resultWriter.lastError)
+        assertTrue(resultWriter.lastError!!.message.contains("api response could not be parsed"))
     }
 }

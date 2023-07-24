@@ -1,8 +1,8 @@
 package mocks
 
-import ApiError
 import IResultWriter
 import arrow.core.Either
+import types.ApiError
 
 class DummyResultWriter : IResultWriter {
     var lastResult: String? = null

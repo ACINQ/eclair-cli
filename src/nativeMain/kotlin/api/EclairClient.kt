@@ -1,13 +1,16 @@
+package api
+
 import arrow.core.Either
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-
-data class ApiError(val code: Int, val message: String)
+import io.ktor.serialization.kotlinx.json.*
+import types.ApiError
 
 interface IEclairClientBuilder {
     fun build(apiHost: String, apiPassword: String): IEclairClient
@@ -30,6 +33,9 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                     BasicAuthCredentials(username = "", password = apiPassword)
                 }
             }
+        }
+        install(ContentNegotiation) {
+            json()
         }
     }
 
