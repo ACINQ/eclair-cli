@@ -13,7 +13,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, macOS-latest, windows-latest ]
+        # ktor's CIO engine isn't yet available on windows: once supported, we should add windows-latest to the following list
+        os: [ ubuntu-latest, macOS-latest ]
     steps:
 
       # 1 - checkout repositories
