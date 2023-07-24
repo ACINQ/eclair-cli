@@ -1,14 +1,14 @@
+import arrow.core.Either
+
 interface IResultWriter {
-    fun writeSuccess(message: String)
-    fun writeError(message: String)
+    fun write(result: Either<ApiError, String>)
 }
 
 class ConsoleResultWriter : IResultWriter {
-    override fun writeSuccess(message: String) {
-        println(message)
-    }
-
-    override fun writeError(message: String) {
-        println("Error: $message")
+    override fun write(result: Either<ApiError, String>) {
+        when (result) {
+            is Either.Right -> println(result.value)
+            is Either.Left -> println("error: ${result.value.message} (code=${result.value.code})")
+        }
     }
 }
