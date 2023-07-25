@@ -25,7 +25,7 @@ class EclairClientBuilder : IEclairClientBuilder {
 
 interface IEclairClient {
     suspend fun getInfo(): Either<ApiError, String>
-    suspend fun connect(nodeId: String): Either<ApiError, String>
+    suspend fun connect(uri: String): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -64,13 +64,10 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
     }
 
     @OptIn(InternalAPI::class)
-    override suspend fun connect(nodeId: String): Either<ApiError, String> {
+    override suspend fun connect(uri: String): Either<ApiError, String> {
         return try {
             val response: HttpResponse = httpClient.post("$apiHost/connect") {
-                contentType(ContentType.Application.Json)
-                body = buildJsonObject{
-                    put("nodeId", nodeId)
-                }
+                setBody(uri)
             }
             when (response.status) {
                 HttpStatusCode.OK -> Either.Right(response.bodyAsText())
