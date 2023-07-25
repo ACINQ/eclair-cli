@@ -11,8 +11,6 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.*
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import types.ApiError
 
 interface IEclairClientBuilder {
