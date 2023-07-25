@@ -10,6 +10,9 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.util.*
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import types.ApiError
 
 interface IEclairClientBuilder {
@@ -22,6 +25,7 @@ class EclairClientBuilder : IEclairClientBuilder {
 
 interface IEclairClient {
     suspend fun getInfo(): Either<ApiError, String>
+    suspend fun connect(nodeId: String): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -56,6 +60,24 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
             HttpStatusCode.Unauthorized -> ApiError(statusCode.value, "invalid api password")
             HttpStatusCode.BadRequest -> ApiError(statusCode.value, "invalid request parameters")
             else -> ApiError(statusCode.value, "api error")
+        }
+    }
+
+    @OptIn(InternalAPI::class)
+    override suspend fun connect(nodeId: String): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.post("$apiHost/connect") {
+                contentType(ContentType.Application.Json)
+                body = buildJsonObject{
+                    put("nodeId", nodeId)
+                }
+            }
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(response.bodyAsText())
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "unknown exception"))
         }
     }
 }
