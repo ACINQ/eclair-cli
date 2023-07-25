@@ -1,13 +1,10 @@
 package commands
 
-import ConsoleResultWriter
 import IResultWriter
 import api.IEclairClientBuilder
-import arrow.core.flatMap
-import kotlinx.cli.*
+import kotlinx.cli.ArgType
+import kotlinx.cli.ExperimentalCli
 import kotlinx.coroutines.runBlocking
-import types.NodeInfo
-import types.Serialization
 
 @OptIn(ExperimentalCli::class)
 class ConnectCommand(

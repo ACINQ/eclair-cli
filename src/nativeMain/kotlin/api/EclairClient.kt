@@ -14,6 +14,7 @@ import io.ktor.http.HttpHeaders.Host
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.*
 import kotlinx.serialization.json.Json
+import platform.linux.user
 import types.ApiError
 
 interface IEclairClientBuilder {
@@ -31,7 +32,7 @@ interface IEclairClient {
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
 
-    private val httpClient = HttpClient(CIO) {
+    private val jsonhttpClient = HttpClient(CIO) {
         install(Auth) {
             basic {
                 credentials {
@@ -44,9 +45,19 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
         }
     }
 
+    private val multiPartHttpClient = HttpClient(CIO) {
+        install(Auth) {
+            basic {
+                credentials {
+                    BasicAuthCredentials(username = "", password = apiPassword)
+                }
+            }
+        }
+    }
+
     override suspend fun getInfo(): Either<ApiError, String> {
         return try {
-            val response: HttpResponse = httpClient.post("$apiHost/getinfo")
+            val response: HttpResponse = jsonhttpClient.post("$apiHost/getinfo")
             when (response.status) {
                 HttpStatusCode.OK -> Either.Right(response.bodyAsText())
                 else -> Either.Left(convertHttpError(response.status))
@@ -67,9 +78,9 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
     @OptIn(InternalAPI::class)
     override suspend fun connect(uri: String): Either<ApiError, String> {
         return try {
-            val response: HttpResponse = httpClient.submitForm(
+            val response: HttpResponse = multiPartHttpClient.submitForm(
                 url = "${apiHost}/connect",
-                formParameters = parameters {
+                formParameters = Parameters.build {
                     append("uri", uri)
                 }
             )
