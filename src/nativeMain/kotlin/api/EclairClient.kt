@@ -10,11 +10,9 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.http.HttpHeaders.Host
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.*
 import kotlinx.serialization.json.Json
-import platform.linux.user
 import types.ApiError
 
 interface IEclairClientBuilder {
