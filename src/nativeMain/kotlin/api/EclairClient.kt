@@ -7,10 +7,13 @@ import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.http.HttpHeaders.Host
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.*
+import kotlinx.serialization.json.Json
 import types.ApiError
 
 interface IEclairClientBuilder {
@@ -64,15 +67,18 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
     @OptIn(InternalAPI::class)
     override suspend fun connect(uri: String): Either<ApiError, String> {
         return try {
-            val response: HttpResponse = httpClient.post("$apiHost/connect") {
-                setBody(uri)
-            }
+            val response: HttpResponse = httpClient.submitForm(
+                url = "${apiHost}/connect",
+                formParameters = parameters {
+                    append("uri", uri)
+                }
+            )
             when (response.status) {
-                HttpStatusCode.OK -> Either.Right(response.bodyAsText())
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
-        } catch (e: Throwable) {
-            Either.Left(ApiError(0, e.message ?: "unknown exception"))
+        } catch (e: Exception) {
+            Either.Left(ApiError(0, e.message ?: "Unknown error"))
         }
     }
 }
