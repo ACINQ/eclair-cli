@@ -1,30 +1,28 @@
 package commands
-
-import IEclairClient
 import IResultWriter
+import api.IEclairClientBuilder
+import arrow.core.flatMap
 import kotlinx.cli.*
 import kotlinx.coroutines.runBlocking
+import types.NodeInfo
+import types.Serialization
 
 @OptIn(ExperimentalCli::class)
 class GetInfoCommand(
-    private val resultWriter: IResultWriter, private val eclairClient: IEclairClient
+    private val resultWriter: IResultWriter,
+    private val eclairClientBuilder: IEclairClientBuilder
 ) : Subcommand(
     "getinfo",
-    "Get information about this instance such as version, features, nodeId and current block height as seen by the eclair."
+    "Returns information about this node instance such as version, features, nodeId and current block height."
 ) {
-    private var password by option(
-        ArgType.String, shortName = "p", description = "Password for the Eclair API"
-    ).required()
-    private var host by option(
-        ArgType.String, shortName = "l", description = "Host URL for the Eclair API"
-    ).default("http://localhost:8080")
+    private var password by option(ArgType.String, shortName = "p", description = "Password for the Eclair API (can be found in eclair.conf)").required()
+    private var host by option(ArgType.String, description = "Host URL for the Eclair API (can be found in eclair.conf)").default("http://localhost:8080")
 
     override fun execute() = runBlocking {
-        val infoResult = eclairClient.getInfo(password, host)
-        if (infoResult.isSuccess) {
-            resultWriter.writeSuccess(infoResult.getOrThrow())
-        } else {
-            resultWriter.writeError("Error fetching information: ${infoResult.exceptionOrNull()?.message}")
-        }
+        val eclairClient = eclairClientBuilder.build(host, password)
+        val result = eclairClient.getInfo()
+            .flatMap { apiResponse -> Serialization.decode<NodeInfo>(apiResponse) }
+            .map { decoded -> Serialization.encode(decoded) }
+        resultWriter.write(result)
     }
 }

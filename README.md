@@ -5,7 +5,12 @@
 # Eclair CLI
 
 `eclair-cli` is a [Kotlin Native](https://kotlinlang.org/docs/native-overview.html) command-line application that lets you interact with your [eclair node](https://github.com/acinq/eclair).
-It runs on various desktop platforms, including linux, macOS and windows.
+It runs on the following desktop platforms:
+
+- linux
+- macOS
+
+Note that Windows is not supported yet as [ktor](https://ktor.io/docs/native-server.html) doesn't have built-in support for Kotlin Native on Windows yet.
 
 ## Installation
 
