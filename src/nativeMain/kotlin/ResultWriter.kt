@@ -11,5 +11,3 @@ class ConsoleResultWriter : IResultWriter {
             is Either.Right -> println(result.value)
             is Either.Left -> println("error: ${result.value.message} (code=${result.value.code})")
         }
-    }
-}

@@ -1,6 +1,7 @@
 import api.EclairClientBuilder
 import commands.GetInfoCommand
 import commands.ConnectCommand
+import commands.DisconnectCommand
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ExperimentalCli
 
