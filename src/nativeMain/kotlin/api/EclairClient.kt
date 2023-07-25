@@ -10,9 +10,7 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.http.HttpHeaders.Host
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.util.*
 import kotlinx.serialization.json.Json
 import types.ApiError
 
@@ -64,12 +62,11 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
         }
     }
 
-    @OptIn(InternalAPI::class)
     override suspend fun connect(uri: String): Either<ApiError, String> {
         return try {
             val response: HttpResponse = httpClient.submitForm(
                 url = "${apiHost}/connect",
-                formParameters = parameters {
+                formParameters = Parameters.build {
                     append("uri", uri)
                 }
             )
