@@ -7,7 +7,9 @@ import mocks.DummyEclairClient
 import mocks.DummyResultWriter
 import mocks.FailingEclairClient
 import types.ApiError
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 @OptIn(ExperimentalCli::class)
 class ConnectCommandTest {
@@ -24,7 +26,15 @@ class ConnectCommandTest {
     fun `successful request via URI`() {
         val resultWriter = runTest(
             DummyEclairClient(),
-            arrayOf("connect", "--host", "http://localhost:8080", "-p", "password", "--uri", "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e@127.0.0.1:9736")
+            arrayOf(
+                "connect",
+                "--host",
+                "http://localhost:8080",
+                "-p",
+                "password",
+                "--uri",
+                "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e@127.0.0.1:9736"
+            )
         )
         assertNull(resultWriter.lastError)
         assertEquals(DummyEclairClient.validConnectUriResponse, resultWriter.lastResult)
@@ -34,7 +44,15 @@ class ConnectCommandTest {
     fun `successful request via NodeId`() {
         val resultWriter = runTest(
             DummyEclairClient(),
-            arrayOf("connect", "--host", "http://localhost:8080", "-p", "password", "--nodeId", "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e")
+            arrayOf(
+                "connect",
+                "--host",
+                "http://localhost:8080",
+                "-p",
+                "password",
+                "--nodeId",
+                "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e"
+            )
         )
         assertNull(resultWriter.lastError)
         assertEquals(DummyEclairClient.validConnectNodeIdResponse, resultWriter.lastResult)
@@ -45,7 +63,15 @@ class ConnectCommandTest {
         val error = ApiError(42, "test failure message")
         val resultWriter = runTest(
             FailingEclairClient(error),
-            arrayOf("connect", "--host", "http://localhost:8080", "-p", "password", "--uri", "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e@127.0.0.1:9736")
+            arrayOf(
+                "connect",
+                "--host",
+                "http://localhost:8080",
+                "-p",
+                "password",
+                "--uri",
+                "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e@127.0.0.1:9736"
+            )
         )
         assertNull(resultWriter.lastResult)
         assertEquals(error, resultWriter.lastError)
@@ -56,7 +82,15 @@ class ConnectCommandTest {
         val error = ApiError(42, "test failure message")
         val resultWriter = runTest(
             FailingEclairClient(error),
-            arrayOf("connect", "--host", "http://localhost:8080", "-p", "password", "--nodeId", "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e")
+            arrayOf(
+                "connect",
+                "--host",
+                "http://localhost:8080",
+                "-p",
+                "password",
+                "--nodeId",
+                "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e"
+            )
         )
         assertNull(resultWriter.lastResult)
         assertEquals(error, resultWriter.lastError)
