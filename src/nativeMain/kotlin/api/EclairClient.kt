@@ -25,6 +25,7 @@ class EclairClientBuilder : IEclairClientBuilder {
 interface IEclairClient {
     suspend fun getInfo(): Either<ApiError, String>
     suspend fun connect(uri: String): Either<ApiError, String>
+    suspend fun disconnect(nodeId: String): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -42,6 +43,14 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
         }
     }
 
+    private fun convertHttpError(statusCode: HttpStatusCode): ApiError {
+        return when (statusCode) {
+            HttpStatusCode.Unauthorized -> ApiError(statusCode.value, "invalid api password")
+            HttpStatusCode.BadRequest -> ApiError(statusCode.value, "invalid request parameters")
+            else -> ApiError(statusCode.value, "api error")
+        }
+    }
+
     override suspend fun getInfo(): Either<ApiError, String> {
         return try {
             val response: HttpResponse = httpClient.post("$apiHost/getinfo")
@@ -54,20 +63,29 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
         }
     }
 
-    private fun convertHttpError(statusCode: HttpStatusCode): ApiError {
-        return when (statusCode) {
-            HttpStatusCode.Unauthorized -> ApiError(statusCode.value, "invalid api password")
-            HttpStatusCode.BadRequest -> ApiError(statusCode.value, "invalid request parameters")
-            else -> ApiError(statusCode.value, "api error")
-        }
-    }
-
     override suspend fun connect(uri: String): Either<ApiError, String> {
         return try {
             val response: HttpResponse = httpClient.submitForm(
                 url = "${apiHost}/connect",
                 formParameters = Parameters.build {
                     append("uri", uri)
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Exception) {
+            Either.Left(ApiError(0, e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun disconnect(nodeId: String): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "${apiHost}/disconnect",
+                formParameters = Parameters.build {
+                    append("nodeId", nodeId)
                 }
             )
             when (response.status) {
