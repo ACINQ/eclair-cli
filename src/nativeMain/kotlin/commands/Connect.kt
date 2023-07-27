@@ -12,12 +12,12 @@ class ConnectCommand(
     "connect",
     "Connect to another lightning node. This will perform a connection but no channels will be opened. "
 ) {
-    private val uri by option(
+    var uri by option(
         ArgType.String,
         description = "If the uri to the target node is not provided, eclair will use one of the addresses published by the remote peer in its node_announcement messages if it can be found."
     )
 
-    private val nodeId by option(
+    var nodeId by option(
         ArgType.String,
         description = "Connect to another lightning node. This does not require a target address. Instead, eclair will use one of the addresses published by the remote peer in its node_announcement messages."
     )
@@ -26,7 +26,7 @@ class ConnectCommand(
         val eclairClient = eclairClientBuilder.build(host, password)
         val result = when {
             uri != null -> eclairClient.connectUri(uri!!)
-            nodeId != null ->eclairClient.connectNodeId(nodeId!!)
+            nodeId != null -> eclairClient.connectNodeId(nodeId!!)
             else -> throw IllegalArgumentException("Either URI or nodeId must be provided.")
         }
         resultWriter.write(result)
