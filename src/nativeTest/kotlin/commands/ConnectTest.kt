@@ -37,7 +37,7 @@ class ConnectCommandTest {
             )
         )
         assertNull(resultWriter.lastError)
-        assertEquals(DummyEclairClient.validConnectUriResponse, resultWriter.lastResult)
+        assertEquals(DummyEclairClient.validConnectResponse, resultWriter.lastResult)
     }
 
     @Test
@@ -55,7 +55,27 @@ class ConnectCommandTest {
             )
         )
         assertNull(resultWriter.lastError)
-        assertEquals(DummyEclairClient.validConnectNodeIdResponse, resultWriter.lastResult)
+        assertEquals(DummyEclairClient.validConnectResponse, resultWriter.lastResult)
+    }
+
+    @Test
+    fun `successful request via Manual`() {
+        val resultWriter = runTest(
+            DummyEclairClient(),
+            arrayOf(
+                "connect",
+                "--host",
+                "http://localhost:8080",
+                "-p",
+                "password",
+                "--nodeId",
+                "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e",
+                "--address",
+                "127.0.0.1"
+            )
+        )
+        assertNull(resultWriter.lastError)
+        assertEquals(DummyEclairClient.validConnectResponse, resultWriter.lastResult)
     }
 
     @Test
@@ -90,6 +110,27 @@ class ConnectCommandTest {
                 "password",
                 "--nodeId",
                 "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e"
+            )
+        )
+        assertNull(resultWriter.lastResult)
+        assertEquals(error, resultWriter.lastError)
+    }
+
+    @Test
+    fun `api error via Manual`() {
+        val error = ApiError(42, "test failure message")
+        val resultWriter = runTest(
+            FailingEclairClient(error),
+            arrayOf(
+                "connect",
+                "--host",
+                "http://localhost:8080",
+                "-p",
+                "password",
+                "--nodeId",
+                "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e",
+                "--address",
+                "127.0.0.1"
             )
         )
         assertNull(resultWriter.lastResult)
