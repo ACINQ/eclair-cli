@@ -32,6 +32,15 @@ interface IEclairClient {
 
     suspend fun connect(target: ConnectionTarget): Either<ApiError, String>
     suspend fun disconnect(nodeId: String): Either<ApiError, String>
+    suspend fun open(
+        nodeId: String,
+        fundingSatoshis: Int,
+        channelType: String?,
+        pushMsat: Int?,
+        fundingFeerateSatByte: Int?,
+        announceChannel: Boolean?,
+        openTimeoutSeconds: Int?
+    ): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -110,6 +119,37 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 url = "${apiHost}/disconnect",
                 formParameters = Parameters.build {
                     append("nodeId", nodeId)
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Exception) {
+            Either.Left(ApiError(0, e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun open(
+        nodeId: String,
+        fundingSatoshis: Int,
+        channelType: String?,
+        pushMsat: Int?,
+        fundingFeerateSatByte: Int?,
+        announceChannel: Boolean?,
+        openTimeoutSeconds: Int?
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "${apiHost}/open",
+                formParameters = Parameters.build {
+                    append("nodeId", nodeId)
+                    append("fundingSatoshis", fundingSatoshis.toString())
+                    channelType?.let { append("channelType", it) }
+                    pushMsat?.let { append("pushMsat", it.toString()) }
+                    fundingFeerateSatByte?.let { append("fundingFeerateSatByte", it.toString()) }
+                    announceChannel?.let { append("announceChannel", it.toString()) }
+                    openTimeoutSeconds?.let { append("openTimeoutSeconds", it.toString()) }
                 }
             )
             when (response.status) {
