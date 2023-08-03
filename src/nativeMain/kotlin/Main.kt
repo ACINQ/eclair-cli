@@ -1,9 +1,5 @@
 import api.EclairClientBuilder
-import commands.ConnectCommand
-import commands.DisconnectCommand
-import commands.GetInfoCommand
-import commands.OpenCommand
-import commands.RbfOpenCommand
+import commands.*
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ExperimentalCli
 
@@ -17,7 +13,8 @@ fun main(args: Array<String>) {
         ConnectCommand(resultWriter, apiClientBuilder),
         DisconnectCommand(resultWriter, apiClientBuilder),
         OpenCommand(resultWriter, apiClientBuilder),
-        RbfOpenCommand(resultWriter, apiClientBuilder)
+        RbfOpenCommand(resultWriter, apiClientBuilder),
+        CpfpBumpFeesCommand(resultWriter, apiClientBuilder)
     )
     parser.parse(args)
 }

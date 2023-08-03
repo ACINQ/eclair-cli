@@ -47,6 +47,8 @@ interface IEclairClient {
         targetFeerateSatByte: Int,
         lockTime: Int?
     ): Either<ApiError, String>
+
+    suspend fun cpfpbumpfees(outpoints: String, targetFeerateSatByte: Int): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -179,6 +181,24 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                     append("channelId", channelId)
                     append("targetFeerateSatByte", targetFeerateSatByte.toString())
                     lockTime?.let { append("lockTime", it.toString()) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Exception) {
+            Either.Left(ApiError(0, e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun cpfpbumpfees(outpoints: String, targetFeerateSatByte: Int): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "${apiHost}/cpfpbumpfees",
+                formParameters = Parameters.build {
+                    append("outpoints", outpoints)
+                    append("targetFeerateSatByte", targetFeerateSatByte.toString())
                 }
             )
             when (response.status) {
