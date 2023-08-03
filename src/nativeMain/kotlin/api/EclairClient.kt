@@ -7,9 +7,11 @@ import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 import types.ApiError
 
 interface IEclairClientBuilder {
@@ -22,6 +24,13 @@ class EclairClientBuilder : IEclairClientBuilder {
 
 interface IEclairClient {
     suspend fun getInfo(): Either<ApiError, String>
+    sealed class ConnectionTarget {
+        data class Uri(val uri: String) : ConnectionTarget()
+        data class NodeId(val nodeId: String) : ConnectionTarget()
+        data class Manual(val nodeId: String, val address: String, val port: Int? = null) : ConnectionTarget()
+    }
+
+    suspend fun connect(target: ConnectionTarget): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -39,6 +48,14 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
         }
     }
 
+    private fun convertHttpError(statusCode: HttpStatusCode): ApiError {
+        return when (statusCode) {
+            HttpStatusCode.Unauthorized -> ApiError(statusCode.value, "invalid api password")
+            HttpStatusCode.BadRequest -> ApiError(statusCode.value, "invalid request parameters")
+            else -> ApiError(statusCode.value, "api error")
+        }
+    }
+
     override suspend fun getInfo(): Either<ApiError, String> {
         return try {
             val response: HttpResponse = httpClient.post("$apiHost/getinfo")
@@ -51,11 +68,39 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
         }
     }
 
-    private fun convertHttpError(statusCode: HttpStatusCode): ApiError {
-        return when (statusCode) {
-            HttpStatusCode.Unauthorized -> ApiError(statusCode.value, "invalid api password")
-            HttpStatusCode.BadRequest -> ApiError(statusCode.value, "invalid request parameters")
-            else -> ApiError(statusCode.value, "api error")
+    override suspend fun connect(target: IEclairClient.ConnectionTarget): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = when (target) {
+                is IEclairClient.ConnectionTarget.Uri -> httpClient.submitForm(
+                    url = "${apiHost}/connect",
+                    formParameters = Parameters.build {
+                        append("uri", target.uri)
+                    }
+                )
+
+                is IEclairClient.ConnectionTarget.NodeId -> httpClient.submitForm(
+                    url = "${apiHost}/connect",
+                    formParameters = Parameters.build {
+                        append("nodeId", target.nodeId)
+                    }
+                )
+
+                is IEclairClient.ConnectionTarget.Manual -> httpClient.submitForm(
+                    url = "${apiHost}/connect",
+                    formParameters = Parameters.build {
+                        append("nodeId", target.nodeId)
+                        append("address", target.address)
+                        target.port?.let { append("port", it.toString()) }
+                    }
+                )
+            }
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Exception) {
+            Either.Left(ApiError(0, e.message ?: "Unknown error"))
         }
     }
+
 }
