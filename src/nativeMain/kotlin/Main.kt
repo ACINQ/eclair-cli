@@ -1,7 +1,8 @@
 import api.EclairClientBuilder
 import commands.ConnectCommand
-import commands.DisconnectCommand
 import commands.GetInfoCommand
+import commands.DisconnectCommand
+import commands.OpenCommand
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ExperimentalCli
 
@@ -13,7 +14,8 @@ fun main(args: Array<String>) {
     parser.subcommands(
         GetInfoCommand(resultWriter, apiClientBuilder),
         ConnectCommand(resultWriter, apiClientBuilder),
-        DisconnectCommand(resultWriter, apiClientBuilder)
+        DisconnectCommand(resultWriter, apiClientBuilder),
+        OpenCommand(resultWriter, apiClientBuilder)
     )
     parser.parse(args)
 }

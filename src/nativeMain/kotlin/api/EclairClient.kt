@@ -22,16 +22,25 @@ class EclairClientBuilder : IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = EclairClient(apiHost, apiPassword)
 }
 
-sealed class ConnectionTarget {
-    data class Uri(val uri: String) : ConnectionTarget()
-    data class NodeId(val nodeId: String) : ConnectionTarget()
-    data class Manual(val nodeId: String, val address: String, val port: Int? = null) : ConnectionTarget()
-}
-
 interface IEclairClient {
     suspend fun getInfo(): Either<ApiError, String>
+    sealed class ConnectionTarget {
+        data class Uri(val uri: String) : ConnectionTarget()
+        data class NodeId(val nodeId: String) : ConnectionTarget()
+        data class Manual(val nodeId: String, val address: String, val port: Int? = null) : ConnectionTarget()
+    }
+
     suspend fun connect(target: ConnectionTarget): Either<ApiError, String>
     suspend fun disconnect(nodeId: String): Either<ApiError, String>
+    suspend fun open(
+        nodeId: String,
+        fundingSatoshis: Int,
+        channelType: String?,
+        pushMsat: Int?,
+        fundingFeerateSatByte: Int?,
+        announceChannel: Boolean?,
+        openTimeoutSeconds: Int?
+    ): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -69,24 +78,24 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
         }
     }
 
-    override suspend fun connect(target: ConnectionTarget): Either<ApiError, String> {
+    override suspend fun connect(target: IEclairClient.ConnectionTarget): Either<ApiError, String> {
         return try {
             val response: HttpResponse = when (target) {
-                is ConnectionTarget.Uri -> httpClient.submitForm(
+                is IEclairClient.ConnectionTarget.Uri -> httpClient.submitForm(
                     url = "${apiHost}/connect",
                     formParameters = Parameters.build {
                         append("uri", target.uri)
                     }
                 )
 
-                is ConnectionTarget.NodeId -> httpClient.submitForm(
+                is IEclairClient.ConnectionTarget.NodeId -> httpClient.submitForm(
                     url = "${apiHost}/connect",
                     formParameters = Parameters.build {
                         append("nodeId", target.nodeId)
                     }
                 )
 
-                is ConnectionTarget.Manual -> httpClient.submitForm(
+                is IEclairClient.ConnectionTarget.Manual -> httpClient.submitForm(
                     url = "${apiHost}/connect",
                     formParameters = Parameters.build {
                         append("nodeId", target.nodeId)
@@ -99,7 +108,7 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             Either.Left(ApiError(0, e.message ?: "Unknown error"))
         }
     }
@@ -116,7 +125,37 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
+            Either.Left(ApiError(0, e.message ?: "Unknown error"))
+        }
+    }
+    override suspend fun open(
+        nodeId: String,
+        fundingSatoshis: Int,
+        channelType: String?,
+        pushMsat: Int?,
+        fundingFeerateSatByte: Int?,
+        announceChannel: Boolean?,
+        openTimeoutSeconds: Int?
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "${apiHost}/open",
+                formParameters = Parameters.build {
+                    append("nodeId", nodeId)
+                    append("fundingSatoshis", fundingSatoshis.toString())
+                    channelType?.let { append("channelType", it) }
+                    pushMsat?.let { append("pushMsat", it.toString()) }
+                    fundingFeerateSatByte?.let { append("fundingFeerateSatByte", it.toString()) }
+                    announceChannel?.let { append("announceChannel", it.toString()) }
+                    openTimeoutSeconds?.let { append("openTimeoutSeconds", it.toString()) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Exception) {
             Either.Left(ApiError(0, e.message ?: "Unknown error"))
         }
     }
