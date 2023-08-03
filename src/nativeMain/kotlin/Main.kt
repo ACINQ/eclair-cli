@@ -3,6 +3,7 @@ import commands.ConnectCommand
 import commands.DisconnectCommand
 import commands.GetInfoCommand
 import commands.OpenCommand
+import commands.RbfOpenCommand
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ExperimentalCli
 
@@ -15,7 +16,8 @@ fun main(args: Array<String>) {
         GetInfoCommand(resultWriter, apiClientBuilder),
         ConnectCommand(resultWriter, apiClientBuilder),
         DisconnectCommand(resultWriter, apiClientBuilder),
-        OpenCommand(resultWriter, apiClientBuilder)
+        OpenCommand(resultWriter, apiClientBuilder),
+        RbfOpenCommand(resultWriter, apiClientBuilder)
     )
     parser.parse(args)
 }

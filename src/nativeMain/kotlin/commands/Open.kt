@@ -16,7 +16,6 @@ class OpenCommand(
         ArgType.String,
         description = "The nodeId of the node you want to open a channel with"
     )
-
     var fundingSatoshis by option(
         ArgType.Int,
         description = "Amount of satoshis to spend in the funding of the channel"
@@ -41,7 +40,6 @@ class OpenCommand(
         ArgType.Int,
         description = "Timeout for the operation to complete"
     )
-
 
     override fun execute() = runBlocking {
         val eclairClient = eclairClientBuilder.build(host, password)
