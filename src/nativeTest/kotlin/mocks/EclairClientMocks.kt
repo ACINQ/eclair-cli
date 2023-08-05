@@ -11,7 +11,8 @@ class DummyEclairClient(
     private val disconnectResponse: String = validDisconnectResponse,
     private val openResponse: String = validOpenResponse,
     private val rbfOpenResponse: String = validRbfOpenResponse,
-    private val cpfpbumpfeesResponse: String = validcpfpbumpfeesResponse
+    private val cpfpbumpfeesResponse: String = validcpfpbumpfeesResponse,
+    private val closeResponse: String = validCloseResponse
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -40,8 +41,19 @@ class DummyEclairClient(
         openTimeoutSeconds: Int?
     ): Either<ApiError, String> = Either.Right(openResponse)
 
-    override suspend fun cpfpbumpfees(outpoints: String, targetFeerateSatByte: Int): Either<ApiError, String> =
+    override suspend fun cpfpbumpfees(outpoints: List<String>, targetFeerateSatByte: Int): Either<ApiError, String> =
         Either.Right(cpfpbumpfeesResponse)
+
+    override suspend fun close(
+        channelId: String,
+        shortChannelId: String?,
+        channelIds: List<String>?,
+        shortChannelIds: List<String>?,
+        scriptPubKey: String?,
+        preferredFeerateSatByte: Int?,
+        minFeerateSatByte: Int?,
+        maxFeerateSatByte: Int?
+    ): Either<ApiError, String> = Either.Right(closeResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -54,6 +66,9 @@ class DummyEclairClient(
             "created channel e872f515dc5d8a3d61ccbd2127f33141eaa115807271dcc5c5c727f3eca914d3 with fundingTxId=bc2b8db55b9588d3a18bd06bd0e284f63ee8cc149c63138d51ac8ef81a72fc6f and fees=720 sat"
         val validRbfOpenResponse = "ok"
         val validcpfpbumpfeesResponse = "83d4f64bd3f7708caad602de0c372a94fcdc50f128519c9505169013215f598f"
+        val validCloseResponse = "{\n" +
+                "  \"<channel>\": \"ok\"\n" +
+                "}"
     }
 }
 
@@ -78,6 +93,17 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
         lockTime: Int?
     ): Either<ApiError, String> = Either.Left(error)
 
-    override suspend fun cpfpbumpfees(outpoints: String, targetFeerateSatByte: Int): Either<ApiError, String> =
+    override suspend fun cpfpbumpfees(outpoints: List<String>, targetFeerateSatByte: Int): Either<ApiError, String> =
         Either.Left(error)
+
+    override suspend fun close(
+        channelId: String,
+        shortChannelId: String?,
+        channelIds: List<String>?,
+        shortChannelIds: List<String>?,
+        scriptPubKey: String?,
+        preferredFeerateSatByte: Int?,
+        minFeerateSatByte: Int?,
+        maxFeerateSatByte: Int?
+    ): Either<ApiError, String> = Either.Left(error)
 }

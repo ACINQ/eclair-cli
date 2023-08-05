@@ -14,7 +14,8 @@ fun main(args: Array<String>) {
         DisconnectCommand(resultWriter, apiClientBuilder),
         OpenCommand(resultWriter, apiClientBuilder),
         RbfOpenCommand(resultWriter, apiClientBuilder),
-        CpfpBumpFeesCommand(resultWriter, apiClientBuilder)
+        CpfpBumpFeesCommand(resultWriter, apiClientBuilder),
+        CloseCommand(resultWriter, apiClientBuilder)
     )
     parser.parse(args)
 }

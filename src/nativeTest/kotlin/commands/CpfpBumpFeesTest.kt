@@ -25,9 +25,9 @@ class CpfpBumpFeesCommandTest {
                 "-p",
                 "password",
                 "--outpoints",
-                "3a9042482e0a8c3c3e5b683c3e1b4d2fe90a3e3c4a534e3e5c4a4d5a6d4b3e5b:2,4b3e5b6d5a4d4a5c3e4e534a3c3e3a0ae92f4d1b3e3c685b3e3c8c0a2e482490:3",
+                "30b6a6d09e504d4ae9fe992af8fd583b16ec8e8b632de5690ab273d64bbd4070:0,30b6a6d09e504d4ae9fe992af8fd583b16ec8e8b632de5690ab273d64bbd4070:1",
                 "--targetFeerateSatByte",
-                "100"
+                "10"
             )
         )
         return resultWriter

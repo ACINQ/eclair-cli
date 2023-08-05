@@ -25,7 +25,7 @@ class CpfpBumpFeesCommand(
     override fun execute() = runBlocking {
         val eclairClient = eclairClientBuilder.build(host, password)
         val result = eclairClient.cpfpbumpfees(
-            outpoints = outpoints!!,
+            outpoints = outpoints?.split(",")!!,
             targetFeerateSatByte = targetFeerateSatByte!!
         )
         resultWriter.write(result)

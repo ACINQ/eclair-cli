@@ -48,7 +48,18 @@ interface IEclairClient {
         lockTime: Int?
     ): Either<ApiError, String>
 
-    suspend fun cpfpbumpfees(outpoints: String, targetFeerateSatByte: Int): Either<ApiError, String>
+    suspend fun cpfpbumpfees(outpoints: List<String>, targetFeerateSatByte: Int): Either<ApiError, String>
+
+    suspend fun close(
+        channelId: String,
+        shortChannelId: String?,
+        channelIds: List<String>?,
+        shortChannelIds: List<String>?,
+        scriptPubKey: String?,
+        preferredFeerateSatByte: Int?,
+        minFeerateSatByte: Int?,
+        maxFeerateSatByte: Int?
+    ): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -192,12 +203,12 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
         }
     }
 
-    override suspend fun cpfpbumpfees(outpoints: String, targetFeerateSatByte: Int): Either<ApiError, String> {
+    override suspend fun cpfpbumpfees(outpoints: List<String>, targetFeerateSatByte: Int): Either<ApiError, String> {
         return try {
             val response: HttpResponse = httpClient.submitForm(
                 url = "${apiHost}/cpfpbumpfees",
                 formParameters = Parameters.build {
-                    append("outpoints", outpoints)
+                    append("outpoints", outpoints.joinToString(","))
                     append("targetFeerateSatByte", targetFeerateSatByte.toString())
                 }
             )
@@ -207,6 +218,39 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
             }
         } catch (e: Exception) {
             Either.Left(ApiError(0, e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun close(
+        channelId: String,
+        shortChannelId: String?,
+        channelIds: List<String>?,
+        shortChannelIds: List<String>?,
+        scriptPubKey: String?,
+        preferredFeerateSatByte: Int?,
+        minFeerateSatByte: Int?,
+        maxFeerateSatByte: Int?
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/close",
+                formParameters = Parameters.build {
+                    append("channelId", channelId)
+                    shortChannelId?.let { append("shortChannelId", it) }
+                    channelIds?.let { append("channelIds", it.joinToString(",")) }
+                    shortChannelIds?.let { append("shortChannelIds", it.joinToString(",")) }
+                    scriptPubKey?.let { append("scriptPubKey", it) }
+                    preferredFeerateSatByte?.let { append("preferredFeerateSatByte", it.toString()) }
+                    minFeerateSatByte?.let { append("minFeerateSatByte", it.toString()) }
+                    maxFeerateSatByte?.let { append("maxFeerateSatByte", it.toString()) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Exception) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
         }
     }
 }
