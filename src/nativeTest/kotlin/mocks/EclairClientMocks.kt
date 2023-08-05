@@ -12,7 +12,8 @@ class DummyEclairClient(
     private val openResponse: String = validOpenResponse,
     private val rbfOpenResponse: String = validRbfOpenResponse,
     private val cpfpbumpfeesResponse: String = validcpfpbumpfeesResponse,
-    private val closeResponse: String = validCloseResponse
+    private val closeResponse: String = validCloseResponse,
+    private val forcecloseResponse: String = validForceCloseResponse
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -55,6 +56,13 @@ class DummyEclairClient(
         maxFeerateSatByte: Int?
     ): Either<ApiError, String> = Either.Right(closeResponse)
 
+    override suspend fun forceclose(
+        channelId: String,
+        shortChannelId: String?,
+        channelIds: List<String>?,
+        shortChannelIds: List<String>?,
+    ): Either<ApiError, String> = Either.Right(forcecloseResponse)
+
     companion object {
         val validGetInfoResponse =
             """{"version":"0.9.0","nodeId":"03e319aa4ecc7a89fb8b3feb6efe9075864b91048bff5bef14efd55a69760ddf17","alias":"alice","color":"#49daaa","features":{"activated":{"var_onion_optin":"mandatory","option_static_remotekey":"optional"},"unknown":[151,178]},"chainHash":"06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f","network":"regtest","blockHeight":107,"publicAddresses":[],"instanceId":"be74bd9a-fc54-4f24-bc41-0477c9ce2fb4"}"""
@@ -67,6 +75,9 @@ class DummyEclairClient(
         val validRbfOpenResponse = "ok"
         val validcpfpbumpfeesResponse = "83d4f64bd3f7708caad602de0c372a94fcdc50f128519c9505169013215f598f"
         val validCloseResponse = "{\n" +
+                "  \"<channel>\": \"ok\"\n" +
+                "}"
+        val validForceCloseResponse = "{\n" +
                 "  \"<channel>\": \"ok\"\n" +
                 "}"
     }
@@ -105,5 +116,12 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
         preferredFeerateSatByte: Int?,
         minFeerateSatByte: Int?,
         maxFeerateSatByte: Int?
+    ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun forceclose(
+        channelId: String,
+        shortChannelId: String?,
+        channelIds: List<String>?,
+        shortChannelIds: List<String>?,
     ): Either<ApiError, String> = Either.Left(error)
 }
