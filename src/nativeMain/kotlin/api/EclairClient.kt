@@ -22,14 +22,14 @@ class EclairClientBuilder : IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = EclairClient(apiHost, apiPassword)
 }
 
+sealed class ConnectionTarget {
+    data class Uri(val uri: String) : ConnectionTarget()
+    data class NodeId(val nodeId: String) : ConnectionTarget()
+    data class Manual(val nodeId: String, val address: String, val port: Int? = null) : ConnectionTarget()
+}
+
 interface IEclairClient {
     suspend fun getInfo(): Either<ApiError, String>
-    sealed class ConnectionTarget {
-        data class Uri(val uri: String) : ConnectionTarget()
-        data class NodeId(val nodeId: String) : ConnectionTarget()
-        data class Manual(val nodeId: String, val address: String, val port: Int? = null) : ConnectionTarget()
-    }
-
     suspend fun connect(target: ConnectionTarget): Either<ApiError, String>
     suspend fun disconnect(nodeId: String): Either<ApiError, String>
 }
@@ -69,24 +69,24 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
         }
     }
 
-    override suspend fun connect(target: IEclairClient.ConnectionTarget): Either<ApiError, String> {
+    override suspend fun connect(target: ConnectionTarget): Either<ApiError, String> {
         return try {
             val response: HttpResponse = when (target) {
-                is IEclairClient.ConnectionTarget.Uri -> httpClient.submitForm(
+                is ConnectionTarget.Uri -> httpClient.submitForm(
                     url = "${apiHost}/connect",
                     formParameters = Parameters.build {
                         append("uri", target.uri)
                     }
                 )
 
-                is IEclairClient.ConnectionTarget.NodeId -> httpClient.submitForm(
+                is ConnectionTarget.NodeId -> httpClient.submitForm(
                     url = "${apiHost}/connect",
                     formParameters = Parameters.build {
                         append("nodeId", target.nodeId)
                     }
                 )
 
-                is IEclairClient.ConnectionTarget.Manual -> httpClient.submitForm(
+                is ConnectionTarget.Manual -> httpClient.submitForm(
                     url = "${apiHost}/connect",
                     formParameters = Parameters.build {
                         append("nodeId", target.nodeId)
@@ -99,7 +99,7 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Either.Left(ApiError(0, e.message ?: "Unknown error"))
         }
     }
@@ -116,7 +116,7 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Either.Left(ApiError(0, e.message ?: "Unknown error"))
         }
     }
