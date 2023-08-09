@@ -7,6 +7,8 @@ import arrow.core.Either
 import kotlinx.cli.ArgType
 import kotlinx.coroutines.runBlocking
 import types.ApiError
+import types.ConnectionResult
+import types.Serialization
 
 class ConnectCommand(
     private val resultWriter: IResultWriter,
@@ -44,7 +46,15 @@ class ConnectCommand(
                     port
                 )
             )
+
             else -> Either.Left(ApiError(400, "invalid request parameters"))
+        }.map { response ->
+            val result = when (response) {
+                "connected" -> ConnectionResult(true)
+                "already connected" -> ConnectionResult(true)
+                else -> ConnectionResult(false)
+            }
+            Serialization.encode(result)
         }
         resultWriter.write(result)
     }

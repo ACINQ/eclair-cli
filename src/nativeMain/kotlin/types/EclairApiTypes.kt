@@ -23,3 +23,6 @@ data class NodeInfo(
     val publicAddresses: List<String>,
     val instanceId: String,
 ) : EclairApiType()
+
+@Serializable
+data class ConnectionResult(val success: Boolean) : EclairApiType()
