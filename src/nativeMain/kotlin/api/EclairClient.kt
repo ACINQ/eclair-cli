@@ -134,7 +134,7 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Either.Left(ApiError(0, e.message ?: "Unknown error"))
         }
     }
@@ -151,7 +151,7 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Either.Left(ApiError(0, e.message ?: "Unknown error"))
         }
     }
@@ -182,7 +182,7 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Either.Left(ApiError(0, e.message ?: "Unknown error"))
         }
     }
@@ -205,7 +205,7 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Either.Left(ApiError(0, e.message ?: "Unknown error"))
         }
     }
@@ -223,7 +223,7 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Either.Left(ApiError(0, e.message ?: "Unknown error"))
         }
     }
@@ -256,7 +256,7 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Either.Left(ApiError(0, e.message ?: "Unknown exception"))
         }
     }
@@ -281,7 +281,7 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Either.Left(ApiError(0, e.message ?: "Unknown exception"))
         }
     }

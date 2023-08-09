@@ -10,13 +10,13 @@ class RbfOpenCommand(
 ) : BaseCommand(
     "rbfopen", "Increase the fees of an unconfirmed dual-funded channel to speed up confirmation."
 ) {
-    var channelId by option(
+    private val channelId by option(
         ArgType.String, description = "The channelId of the channel that should be RBF-ed"
     )
-    var targetFeerateSatByte by option(
+    private val targetFeerateSatByte by option(
         ArgType.Int, description = "Feerate in sat/byte to apply to the funding transaction"
     )
-    var lockTime by option(
+    private val lockTime by option(
         ArgType.Int, description = "The nLockTime to apply to the funding transaction"
     )
 

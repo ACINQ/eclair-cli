@@ -15,35 +15,35 @@ class CloseCommand(
     "close",
     "Initiates a cooperative close for given channels that belong to this eclair node."
 ) {
-    var channelId by option(
+    private val channelId by option(
         ArgType.String,
         description = "The channelId of the channel you want to close"
     )
-    var shortChannelId by option(
+    private val shortChannelId by option(
         ArgType.String,
         description = "The shortChannelId of the channel you want to close"
     )
-    var channelIds by option(
+    private val channelIds by option(
         ArgType.String,
         description = "List of channelIds to close"
     )
-    var shortChannelIds by option(
+    private val shortChannelIds by option(
         ArgType.String,
         description = "List of shortChannelIds to close"
     )
-    var scriptPubKey by option(
+    private val scriptPubKey by option(
         ArgType.String,
         description = "A serialized scriptPubKey that you want to use to close the channel"
     )
-    var preferredFeerateSatByte by option(
+    private val preferredFeerateSatByte by option(
         ArgType.Int,
         description = "Preferred feerate (sat/byte) for the closing transaction"
     )
-    var minFeerateSatByte by option(
+    private val minFeerateSatByte by option(
         ArgType.Int,
         description = "Minimum feerate (sat/byte) for the closing transaction"
     )
-    var maxFeerateSatByte by option(
+    private val maxFeerateSatByte by option(
         ArgType.Int,
         description = "Maximum feerate (sat/byte) for the closing transaction"
     )

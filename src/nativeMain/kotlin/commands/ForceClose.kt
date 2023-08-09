@@ -15,19 +15,19 @@ class ForceCloseCommand(
     "forceclose",
     "Initiates a unilateral close for given channels that belong to this eclair node."
 ) {
-    var channelId by option(
+    private val channelId by option(
         ArgType.String,
         description = "The channelId of the channel you want to close"
     )
-    var shortChannelId by option(
+    private val shortChannelId by option(
         ArgType.String,
         description = "The shortChannelId of the channel you want to close"
     )
-    var channelIds by option(
+    private val channelIds by option(
         ArgType.String,
         description = "List of channelIds to close"
     )
-    var shortChannelIds by option(
+    private val shortChannelIds by option(
         ArgType.String,
         description = "List of shortChannelIds to close"
     )

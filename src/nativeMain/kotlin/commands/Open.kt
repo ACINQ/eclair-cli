@@ -12,31 +12,31 @@ class OpenCommand(
     "open",
     "Open a channel to another lightning node. You must specify the target nodeId and the funding satoshis for the new channel. "
 ) {
-    var nodeId by option(
+    private val nodeId by option(
         ArgType.String,
         description = "The nodeId of the node you want to open a channel with"
     )
-    var fundingSatoshis by option(
+    private val fundingSatoshis by option(
         ArgType.Int,
         description = "Amount of satoshis to spend in the funding of the channel"
     )
-    var channelType by option(
+    private val channelType by option(
         ArgType.String,
         description = "Channel type (standard, static_remotekey, anchor_outputs_zero_fee_htlc_tx)"
     )
-    var pushMsat by option(
+    private val pushMsat by option(
         ArgType.Int,
         description = "Amount of millisatoshi to unilaterally push to the counterparty"
     )
-    var fundingFeerateSatByte by option(
+    private val fundingFeerateSatByte by option(
         ArgType.Int,
         description = "Feerate in sat/byte to apply to the funding transaction"
     )
-    var announceChannel by option(
+    private val announceChannel by option(
         ArgType.Boolean,
         description = "True for public channels, false otherwise"
     )
-    var openTimeoutSeconds by option(
+    private val openTimeoutSeconds by option(
         ArgType.Int,
         description = "Timeout for the operation to complete"
     )
