@@ -7,6 +7,8 @@ import mocks.DummyEclairClient
 import mocks.DummyResultWriter
 import mocks.FailingEclairClient
 import types.ApiError
+import types.DisconnectionResult
+import types.Serialization
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -36,7 +38,8 @@ class DisconnectCommandTest {
         val resultWriter = runTest(DummyEclairClient())
         assertNull(resultWriter.lastError)
         assertNotNull(resultWriter.lastResult)
-        assertEquals(DummyEclairClient.validDisconnectResponse, resultWriter.lastResult!!)
+        val expectedOutput = Serialization.encode(DisconnectionResult(true, DummyEclairClient.validDisconnectResponse))
+        assertEquals(expectedOutput, resultWriter.lastResult)
     }
 
     @Test

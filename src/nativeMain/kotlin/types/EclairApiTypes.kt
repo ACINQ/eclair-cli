@@ -26,3 +26,6 @@ data class NodeInfo(
 
 @Serializable
 data class ConnectionResult(val success: Boolean) : EclairApiType()
+
+@Serializable
+data class DisconnectionResult(val success: Boolean, val message: String) : EclairApiType()

@@ -50,8 +50,7 @@ class ConnectCommand(
             else -> Either.Left(ApiError(400, "invalid request parameters"))
         }.map { response ->
             val result = when (response) {
-                "connected" -> ConnectionResult(true)
-                "already connected" -> ConnectionResult(true)
+                "connected", "already connected" -> ConnectionResult(true)
                 else -> ConnectionResult(false)
             }
             Serialization.encode(result)
