@@ -1,5 +1,4 @@
 package commands
-
 import kotlinx.cli.*
 
 @OptIn(ExperimentalCli::class)

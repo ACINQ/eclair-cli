@@ -1,10 +1,14 @@
 package commands
 
 import IResultWriter
-import api.IEclairClient
+import api.ConnectionTarget
 import api.IEclairClientBuilder
+import arrow.core.Either
 import kotlinx.cli.ArgType
 import kotlinx.coroutines.runBlocking
+import types.ApiError
+import types.ConnectionResult
+import types.Serialization
 
 class ConnectCommand(
     private val resultWriter: IResultWriter,
@@ -13,37 +17,43 @@ class ConnectCommand(
     "connect",
     "Connect to another lightning node. This will perform a connection but no channels will be opened. "
 ) {
-    var uri by option(
+    private val uri by option(
         ArgType.String,
         description = "If the uri to the target node is not provided, eclair will use one of the addresses published by the remote peer in its node_announcement messages if it can be found."
     )
-    var nodeId by option(
+    private val nodeId by option(
         ArgType.String,
         description = "Connect to another lightning node. This does not require a target address. Instead, eclair will use one of the addresses published by the remote peer in its node_announcement messages."
     )
-    var address by option(
+    private val address by option(
         ArgType.String,
         description = "The IPv4 host address of the node."
     )
-    var port by option(
+    private val port by option(
         ArgType.Int,
-        description = "The port of the node(default: 9735)"
+        description = "The port of the node (default: 9735)"
     )
 
     override fun execute() = runBlocking {
         val eclairClient = eclairClientBuilder.build(host, password)
         val result = when {
-            uri != null -> eclairClient.connect(IEclairClient.ConnectionTarget.Uri(uri!!))
-            nodeId != null && address == null -> eclairClient.connect(IEclairClient.ConnectionTarget.NodeId(nodeId!!))
+            uri != null -> eclairClient.connect(ConnectionTarget.Uri(uri!!))
+            nodeId != null && address == null -> eclairClient.connect(ConnectionTarget.NodeId(nodeId!!))
             nodeId != null && address != null -> eclairClient.connect(
-                IEclairClient.ConnectionTarget.Manual(
+                ConnectionTarget.Manual(
                     nodeId!!,
                     address!!,
                     port
                 )
             )
 
-            else -> throw IllegalArgumentException("Either URI or nodeId must be provided.")
+            else -> Either.Left(ApiError(400, "invalid request parameters"))
+        }.map { response ->
+            val result = when (response) {
+                "connected", "already connected" -> ConnectionResult(true)
+                else -> ConnectionResult(false)
+            }
+            Serialization.encode(result)
         }
         resultWriter.write(result)
     }

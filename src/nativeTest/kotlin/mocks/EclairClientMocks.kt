@@ -1,5 +1,6 @@
 package mocks
 
+import api.ConnectionTarget
 import api.IEclairClient
 import api.IEclairClientBuilder
 import arrow.core.Either
@@ -17,14 +18,7 @@ class DummyEclairClient(
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
-    override suspend fun connect(target: IEclairClient.ConnectionTarget): Either<ApiError, String> {
-        return when (target) {
-            is IEclairClient.ConnectionTarget.Uri -> Either.Right(connectResponse)
-            is IEclairClient.ConnectionTarget.NodeId -> Either.Right(connectResponse)
-            is IEclairClient.ConnectionTarget.Manual -> Either.Right(connectResponse)
-        }
-    }
-
+    override suspend fun connect(target: ConnectionTarget): Either<ApiError, String> = Either.Right(validConnectResponse)
     override suspend fun rbfopen(
         channelId: String,
         targetFeerateSatByte: Int,
@@ -86,7 +80,7 @@ class DummyEclairClient(
 class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Left(error)
-    override suspend fun connect(target: IEclairClient.ConnectionTarget): Either<ApiError, String> = Either.Left(error)
+    override suspend fun connect(target: ConnectionTarget): Either<ApiError, String> = Either.Left(error)
     override suspend fun disconnect(nodeId: String): Either<ApiError, String> = Either.Left(error)
     override suspend fun open(
         nodeId: String,
