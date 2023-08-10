@@ -2,11 +2,13 @@ package commands
 
 import IResultWriter
 import api.IEclairClientBuilder
+import arrow.core.Either
 import arrow.core.flatMap
 import kotlinx.cli.ArgType
 import kotlinx.coroutines.runBlocking
-import types.CloseResponse
-import types.Serialization
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import types.ApiError
 
 class ForceCloseCommand(
     private val resultWriter: IResultWriter,
@@ -34,14 +36,27 @@ class ForceCloseCommand(
 
     override fun execute() = runBlocking {
         val eclairClient = eclairClientBuilder.build(host, password)
+        val format = Json {
+            ignoreUnknownKeys = true
+            prettyPrint = true
+            isLenient = true
+        }
         val result = eclairClient.forceclose(
             channelId = channelId!!,
             shortChannelId = shortChannelId,
             channelIds = channelIds?.split(","),
             shortChannelIds = shortChannelIds?.split(",")
         )
-            .flatMap { apiResponse -> Serialization.decode<CloseResponse>(apiResponse) }
-            .map { decoded -> Serialization.encode(decoded) }
+            .flatMap { apiResponse ->
+                try {
+                    Either.Right(format.decodeFromString<Map<String, String>>(apiResponse))
+                } catch (e: Throwable) {
+                    Either.Left(ApiError(1, "api response could not be parsed: $apiResponse"))
+                }
+            }
+            .map { decoded ->
+                format.encodeToString(decoded)
+            }
         resultWriter.write(result)
     }
 }

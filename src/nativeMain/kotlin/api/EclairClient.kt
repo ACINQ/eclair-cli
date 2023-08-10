@@ -253,7 +253,7 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 }
             )
             when (response.status) {
-                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
+                HttpStatusCode.OK -> Either.Right(response.bodyAsText())
                 else -> Either.Left(convertHttpError(response.status))
             }
         } catch (e: Throwable) {
@@ -278,7 +278,7 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 }
             )
             when (response.status) {
-                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
         } catch (e: Throwable) {

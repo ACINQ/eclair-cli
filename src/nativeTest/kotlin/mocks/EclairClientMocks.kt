@@ -68,12 +68,14 @@ class DummyEclairClient(
             "created channel e872f515dc5d8a3d61ccbd2127f33141eaa115807271dcc5c5c727f3eca914d3 with fundingTxId=bc2b8db55b9588d3a18bd06bd0e284f63ee8cc149c63138d51ac8ef81a72fc6f and fees=720 sat"
         val validRbfOpenResponse = "ok"
         val validcpfpbumpfeesResponse = "83d4f64bd3f7708caad602de0c372a94fcdc50f128519c9505169013215f598f"
-        val validCloseResponse = "{\n" +
-                "  \"<channel>\": \"ok\"\n" +
-                "}"
-        val validForceCloseResponse = "{\n" +
-                "  \"<channel>\": \"ok\"\n" +
-                "}"
+        val validCloseResponse = """{
+    "b7f194155be377e8c4b8fb3a8e8c465f6e7506b875e56c2a4bc8ef57df380641": "closed channel b7f194155be377e8c4b8fb3a8e8c465f6e7506b875e56c2a4bc8ef57df380641"
+}
+"""
+        val validForceCloseResponse = """{
+    "b7f194155be377e8c4b8fb3a8e8c465f6e7506b875e56c2a4bc8ef57df380641": "closed channel b7f194155be377e8c4b8fb3a8e8c465f6e7506b875e56c2a4bc8ef57df380641"
+}
+"""
     }
 }
 
