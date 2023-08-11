@@ -32,6 +32,41 @@ interface IEclairClient {
     suspend fun getInfo(): Either<ApiError, String>
     suspend fun connect(target: ConnectionTarget): Either<ApiError, String>
     suspend fun disconnect(nodeId: String): Either<ApiError, String>
+    suspend fun open(
+        nodeId: String,
+        fundingSatoshis: Int,
+        channelType: String?,
+        pushMsat: Int?,
+        fundingFeerateSatByte: Int?,
+        announceChannel: Boolean?,
+        openTimeoutSeconds: Int?
+    ): Either<ApiError, String>
+
+    suspend fun rbfopen(
+        channelId: String,
+        targetFeerateSatByte: Int,
+        lockTime: Int?
+    ): Either<ApiError, String>
+
+    suspend fun cpfpbumpfees(outpoints: List<String>, targetFeerateSatByte: Int): Either<ApiError, String>
+
+    suspend fun close(
+        channelId: String,
+        shortChannelId: String?,
+        channelIds: List<String>?,
+        shortChannelIds: List<String>?,
+        scriptPubKey: String?,
+        preferredFeerateSatByte: Int?,
+        minFeerateSatByte: Int?,
+        maxFeerateSatByte: Int?
+    ): Either<ApiError, String>
+
+    suspend fun forceclose(
+        channelId: String,
+        shortChannelId: String?,
+        channelIds: List<String>?,
+        shortChannelIds: List<String>?,
+    ): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -118,6 +153,136 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
             }
         } catch (e: Throwable) {
             Either.Left(ApiError(0, e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun open(
+        nodeId: String,
+        fundingSatoshis: Int,
+        channelType: String?,
+        pushMsat: Int?,
+        fundingFeerateSatByte: Int?,
+        announceChannel: Boolean?,
+        openTimeoutSeconds: Int?
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "${apiHost}/open",
+                formParameters = Parameters.build {
+                    append("nodeId", nodeId)
+                    append("fundingSatoshis", fundingSatoshis.toString())
+                    channelType?.let { append("channelType", it) }
+                    pushMsat?.let { append("pushMsat", it.toString()) }
+                    fundingFeerateSatByte?.let { append("fundingFeerateSatByte", it.toString()) }
+                    announceChannel?.let { append("announceChannel", it.toString()) }
+                    openTimeoutSeconds?.let { append("openTimeoutSeconds", it.toString()) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun rbfopen(
+        channelId: String,
+        targetFeerateSatByte: Int,
+        lockTime: Int?
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "${apiHost}/rbfopen",
+                formParameters = Parameters.build {
+                    append("channelId", channelId)
+                    append("targetFeerateSatByte", targetFeerateSatByte.toString())
+                    lockTime?.let { append("lockTime", it.toString()) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun cpfpbumpfees(outpoints: List<String>, targetFeerateSatByte: Int): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "${apiHost}/cpfpbumpfees",
+                formParameters = Parameters.build {
+                    append("outpoints", outpoints.joinToString(","))
+                    append("targetFeerateSatByte", targetFeerateSatByte.toString())
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun close(
+        channelId: String,
+        shortChannelId: String?,
+        channelIds: List<String>?,
+        shortChannelIds: List<String>?,
+        scriptPubKey: String?,
+        preferredFeerateSatByte: Int?,
+        minFeerateSatByte: Int?,
+        maxFeerateSatByte: Int?
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/close",
+                formParameters = Parameters.build {
+                    append("channelId", channelId)
+                    shortChannelId?.let { append("shortChannelId", it) }
+                    channelIds?.let { append("channelIds", it.joinToString(",")) }
+                    shortChannelIds?.let { append("shortChannelIds", it.joinToString(",")) }
+                    scriptPubKey?.let { append("scriptPubKey", it) }
+                    preferredFeerateSatByte?.let { append("preferredFeerateSatByte", it.toString()) }
+                    minFeerateSatByte?.let { append("minFeerateSatByte", it.toString()) }
+                    maxFeerateSatByte?.let { append("maxFeerateSatByte", it.toString()) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(response.bodyAsText())
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun forceclose(
+        channelId: String,
+        shortChannelId: String?,
+        channelIds: List<String>?,
+        shortChannelIds: List<String>?,
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/forceclose",
+                formParameters = Parameters.build {
+                    append("channelId", channelId)
+                    shortChannelId?.let { append("shortChannelId", it) }
+                    channelIds?.let { append("channelIds", it.joinToString(",")) }
+                    shortChannelIds?.let { append("shortChannelIds", it.joinToString(",")) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
         }
     }
 }

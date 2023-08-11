@@ -8,14 +8,54 @@ import types.ApiError
 
 class DummyEclairClient(
     private val getInfoResponse: String = validGetInfoResponse,
-    private val connectResponseMap: String = validConnectResponse,
-    private val disconnectResponse: String = validDisconnectResponse
+    private val connectResponse: String = validConnectResponse,
+    private val disconnectResponse: String = validDisconnectResponse,
+    private val openResponse: String = validOpenResponse,
+    private val rbfOpenResponse: String = validRbfOpenResponse,
+    private val cpfpbumpfeesResponse: String = validcpfpbumpfeesResponse,
+    private val closeResponse: String = validCloseResponse,
+    private val forcecloseResponse: String = validForceCloseResponse
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
     override suspend fun connect(target: ConnectionTarget): Either<ApiError, String> = Either.Right(validConnectResponse)
+    override suspend fun rbfopen(
+        channelId: String,
+        targetFeerateSatByte: Int,
+        lockTime: Int?
+    ): Either<ApiError, String> = Either.Right(rbfOpenResponse)
 
     override suspend fun disconnect(nodeId: String): Either<ApiError, String> = Either.Right(disconnectResponse)
+    override suspend fun open(
+        nodeId: String,
+        fundingSatoshis: Int,
+        channelType: String?,
+        pushMsat: Int?,
+        fundingFeerateSatByte: Int?,
+        announceChannel: Boolean?,
+        openTimeoutSeconds: Int?
+    ): Either<ApiError, String> = Either.Right(openResponse)
+
+    override suspend fun cpfpbumpfees(outpoints: List<String>, targetFeerateSatByte: Int): Either<ApiError, String> =
+        Either.Right(cpfpbumpfeesResponse)
+
+    override suspend fun close(
+        channelId: String,
+        shortChannelId: String?,
+        channelIds: List<String>?,
+        shortChannelIds: List<String>?,
+        scriptPubKey: String?,
+        preferredFeerateSatByte: Int?,
+        minFeerateSatByte: Int?,
+        maxFeerateSatByte: Int?
+    ): Either<ApiError, String> = Either.Right(closeResponse)
+
+    override suspend fun forceclose(
+        channelId: String,
+        shortChannelId: String?,
+        channelIds: List<String>?,
+        shortChannelIds: List<String>?,
+    ): Either<ApiError, String> = Either.Right(forcecloseResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -24,6 +64,18 @@ class DummyEclairClient(
         val validConnectResponse = "connected"
         val validDisconnectResponse =
             "peer 02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e disconnecting"
+        val validOpenResponse =
+            "created channel e872f515dc5d8a3d61ccbd2127f33141eaa115807271dcc5c5c727f3eca914d3 with fundingTxId=bc2b8db55b9588d3a18bd06bd0e284f63ee8cc149c63138d51ac8ef81a72fc6f and fees=720 sat"
+        val validRbfOpenResponse = "ok"
+        val validcpfpbumpfeesResponse = "83d4f64bd3f7708caad602de0c372a94fcdc50f128519c9505169013215f598f"
+        val validCloseResponse = """{
+    "b7f194155be377e8c4b8fb3a8e8c465f6e7506b875e56c2a4bc8ef57df380641": "closed channel b7f194155be377e8c4b8fb3a8e8c465f6e7506b875e56c2a4bc8ef57df380641"
+}
+"""
+        val validForceCloseResponse = """{
+    "b7f194155be377e8c4b8fb3a8e8c465f6e7506b875e56c2a4bc8ef57df380641": "closed channel b7f194155be377e8c4b8fb3a8e8c465f6e7506b875e56c2a4bc8ef57df380641"
+}
+"""
     }
 }
 
@@ -32,4 +84,40 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
     override suspend fun getInfo(): Either<ApiError, String> = Either.Left(error)
     override suspend fun connect(target: ConnectionTarget): Either<ApiError, String> = Either.Left(error)
     override suspend fun disconnect(nodeId: String): Either<ApiError, String> = Either.Left(error)
+    override suspend fun open(
+        nodeId: String,
+        fundingSatoshis: Int,
+        channelType: String?,
+        pushMsat: Int?,
+        fundingFeerateSatByte: Int?,
+        announceChannel: Boolean?,
+        openTimeoutSeconds: Int?
+    ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun rbfopen(
+        channelId: String,
+        targetFeerateSatByte: Int,
+        lockTime: Int?
+    ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun cpfpbumpfees(outpoints: List<String>, targetFeerateSatByte: Int): Either<ApiError, String> =
+        Either.Left(error)
+
+    override suspend fun close(
+        channelId: String,
+        shortChannelId: String?,
+        channelIds: List<String>?,
+        shortChannelIds: List<String>?,
+        scriptPubKey: String?,
+        preferredFeerateSatByte: Int?,
+        minFeerateSatByte: Int?,
+        maxFeerateSatByte: Int?
+    ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun forceclose(
+        channelId: String,
+        shortChannelId: String?,
+        channelIds: List<String>?,
+        shortChannelIds: List<String>?,
+    ): Either<ApiError, String> = Either.Left(error)
 }
