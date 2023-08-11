@@ -1,11 +1,22 @@
+# eclair-cli_autocomplete.sh
+# 
 # To use this script, source it into your .bashrc
 # Use command `source /path/to/eclair-cli_autocomplete.sh`
-
+# This script provides command-line autocompletion for `eclair-cli.kexe`.
+# Once sourced in your shell (e.g., Bash), you can start typing a command
+# and use the <Tab> key to autocomplete or get suggestions for commands and options.
+# Tutorials followed: 
+# https://tldp.org/LDP/abs/html/
+# https://iridakos.com/programming/2018/03/01/bash-programmable-completion-tutorial
+# https://www.youtube.com/watch?v=emhouufDnB4
 
 #!/bin/bash
 
 _eclair_cli() {
     local cur prev words cword
+    
+    # Initialize the completion environment. 
+    # `_init_completion` is a helper function provided by the Bash-completion package.
     _init_completion || return
 
     local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose"
@@ -18,6 +29,7 @@ _eclair_cli() {
     local close_opts="--channelId --shortChannelId --channelIds --shortChannelIds --scriptPubKey --preferredFeerateSatByte --minFeerateSatByte --maxFeerateSatByte"
     local forceclose_opts="--channelId --shortChannelId --channelIds --shortChannelIds"
 
+	# If the current word starts with a dash (-), it's an option rather than a command
      if [[ ${cur} == -* ]]; then
         local cmd=""
         for ((i=$cword; i>0; i--)); do
@@ -26,7 +38,9 @@ _eclair_cli() {
                 break
             fi
         done
+        # The loop breaks as soon as the command is assigned to the cmd variable.
 
+	# Depending upon the detected main command, we suggest relevant options.
         case $cmd in
             connect)
                 COMPREPLY=( $(compgen -W "${connect_opts} ${common_opts}" -- ${cur}) )
@@ -55,6 +69,7 @@ _eclair_cli() {
         esac
     else
         COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
+        # If the current word doesn't start with a -, the user is probably typing a main command. Hence, compgen is used to suggest completions from the list of main commands.
     fi
 }
 
