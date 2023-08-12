@@ -29,3 +29,11 @@ data class ConnectionResult(val success: Boolean) : EclairApiType()
 
 @Serializable
 data class DisconnectionResult(val success: Boolean, val message: String) : EclairApiType()
+
+@Serializable
+data class Peer(
+    val nodeId: String,
+    val state: String,
+    val address: String? = null,
+    val channels: Int
+)
