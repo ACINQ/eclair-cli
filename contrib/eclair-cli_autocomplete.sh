@@ -19,8 +19,8 @@ _eclair_cli() {
     # `_init_completion` is a helper function provided by the Bash-completion package.
     _init_completion || return
 
-    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose"
-    local common_opts="-p"
+    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers"
+    local common_opts="-p --host"
     local connect_opts="--uri --nodeId --address --port"
     local disconnect_opts="--nodeId"
     local open_opts="--nodeId --fundingSatoshis --channelType --pushMsat --fundingFeerateSatByte --announceChannel --openTimeoutSeconds"
@@ -28,6 +28,7 @@ _eclair_cli() {
     local cpfpbumpfees_opts="--outpoints --targetFeerateSatByte"
     local close_opts="--channelId --shortChannelId --channelIds --shortChannelIds --scriptPubKey --preferredFeerateSatByte --minFeerateSatByte --maxFeerateSatByte"
     local forceclose_opts="--channelId --shortChannelId --channelIds --shortChannelIds"
+    local updaterelayfee_opts="--nodeId --nodeIds --feeBaseMsat --feeProportionalMillionths"
 
 	# If the current word starts with a dash (-), it's an option rather than a command
      if [[ ${cur} == -* ]]; then
@@ -62,6 +63,9 @@ _eclair_cli() {
                 ;;
             forceclose)
                 COMPREPLY=( $(compgen -W "${forceclose_opts} ${common_opts}" -- ${cur}) )
+                ;;
+            updaterelayfee)
+                COMPREPLY=( $(compgen -W "${updaterelayfee_opts} ${common_opts}" -- ${cur}) )
                 ;;
             *)
                 COMPREPLY=( $(compgen -W "${common_opts}" -- ${cur}) )
