@@ -5,7 +5,7 @@ import api.IEclairClientBuilder
 import arrow.core.flatMap
 import kotlinx.cli.ArgType
 import kotlinx.coroutines.runBlocking
-import types.CreateInvoiceResponse
+import types.Invoice
 import types.Serialization
 
 class CreateInvoiceCommand(
@@ -50,7 +50,7 @@ class CreateInvoiceCommand(
             fallbackAddress = fallbackAddress,
             paymentPreimage = paymentPreimage
         )
-            .flatMap { apiResponse -> Serialization.decode<CreateInvoiceResponse>(apiResponse) }
+            .flatMap { apiResponse -> Serialization.decode<Invoice>(apiResponse) }
             .map { decoded -> Serialization.encode(decoded) }
         resultWriter.write(result)
     }

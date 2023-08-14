@@ -92,7 +92,7 @@ data class ChannelFlags(
 )
 
 @Serializable
-data class CreateInvoiceResponse(
+data class Invoice(
     val prefix: String,
     val timestamp: Long,
     val nodeId: String,

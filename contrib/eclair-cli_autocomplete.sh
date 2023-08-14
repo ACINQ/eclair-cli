@@ -19,7 +19,7 @@ _eclair_cli() {
     # `_init_completion` is a helper function provided by the Bash-completion package.
     _init_completion || return
 
-    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers nodes node allchannels allupdates createinvoice deleteinvoice"
+    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers nodes node allchannels allupdates createinvoice deleteinvoice parseinvoice"
     local common_opts="-p --host"
     local connect_opts="--uri --nodeId --address --port"
     local disconnect_opts="--nodeId"
@@ -34,6 +34,7 @@ _eclair_cli() {
     local allupdates_opts="--nodeId"
     local createinvoice_opts="--description --descriptionHash --amountMsat --expireIn --fallbackAddress --paymentPreimage"
     local deleteinvoice_opts="--paymentHash"
+    local parseinvoice_opts="--invoice"
 
 	# If the current word starts with a dash (-), it's an option rather than a command
      if [[ ${cur} == -* ]]; then
@@ -87,6 +88,9 @@ _eclair_cli() {
             deleteinvoice)
                 COMPREPLY=( $(compgen -W "${deleteinvoice_opts} ${common_opts}" -- ${cur}) )
                 ;;
+            parseinvoice)
+                COMPREPLY=( $(compgen -W "${parseinvoice_opts} ${common_opts}" -- ${cur}) )
+               ;;
             *)
                 COMPREPLY=( $(compgen -W "${common_opts}" -- ${cur}) )
                 ;;

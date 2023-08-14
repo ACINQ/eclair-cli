@@ -23,6 +23,7 @@ class DummyEclairClient(
     private val allUpdatesResponse: String = validAllUpdatesResponse,
     private val createInvoiceResponse: String = validCreateInvoiceResponse,
     private val deleteInvoiceResponse: String = validDeleteInvoiceResponse,
+    private val parseInvoiceResponse: String = validParseInvoiceResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -92,6 +93,8 @@ class DummyEclairClient(
     ): Either<ApiError, String> = Either.Right(createInvoiceResponse)
 
     override suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String> = Either.Right(deleteInvoiceResponse)
+
+    override suspend fun parseinvoice(invoice: String): Either<ApiError, String> = Either.Right(parseInvoiceResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -310,6 +313,28 @@ class DummyEclairClient(
   "routingInfo": []
 }"""
         val validDeleteInvoiceResponse = "deleted invoice 6f0864735283ca95eaf9c50ef77893f55ee3dd11cb90710cbbfb73f018798a68"
+        val validParseInvoiceResponse = """{
+  "prefix": "lnbcrt",
+  "timestamp": 1643718891,
+  "nodeId": "028e2403fbfddb3d787843361f91adbda64c6f622921b19fb48f5766508bcadb29",
+  "serialized": "lnbcrt500n1pslj28tpp55kxmmddatrnmf42a55mk4wzz4ryq8tv2vwrrarj27e0hhjgpscjqdq0ydex2cmtd3jhxucsp5qu6jq5heq4lcjpj2r8gp0sd65860yzc5yw3xrwde6c4m3mlessxsmqz9gxqrrsscqp79qtzsqqqqqysgqr2fy2yz4655hwql2nwkk3t9saxhj80340cxfzf7fwhweasncv77ym7wcv0p54e4kt7jpmfdavnj5urq84syh9t2t49qdgj4ra8jl40gp6ys45n",
+  "description": "#reckless",
+  "paymentHash": "a58dbdb5bd58e7b4d55da5376ab842a8c803ad8a63863e8e4af65f7bc9018624",
+  "paymentMetadata": "2a",
+  "expiry": 3600,
+  "minFinalCltvExpiry": 30,
+  "amount": 50000,
+  "features": {
+    "activated": {
+      "payment_secret": "mandatory",
+      "basic_mpp": "optional",
+      "option_payment_metadata": "optional",
+      "var_onion_optin": "mandatory"
+    },
+    "unknown": []
+  },
+  "routingInfo": []
+}"""
     }
 }
 
@@ -382,4 +407,6 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
     ): Either<ApiError, String>  = Either.Left(error)
 
     override suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun parseinvoice(invoice: String): Either<ApiError, String> = Either.Left(error)
 }
