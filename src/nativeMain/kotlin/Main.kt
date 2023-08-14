@@ -18,7 +18,9 @@ fun main(args: Array<String>) {
         CloseCommand(resultWriter, apiClientBuilder),
         ForceCloseCommand(resultWriter, apiClientBuilder),
         UpdateRelayFeeCommand(resultWriter, apiClientBuilder),
-        PeersCommand(resultWriter, apiClientBuilder)
+        PeersCommand(resultWriter, apiClientBuilder),
+        UpdateRelayFeeCommand(resultWriter, apiClientBuilder),
+        NodesCommand(resultWriter, apiClientBuilder),
     )
     parser.parse(args)
 }

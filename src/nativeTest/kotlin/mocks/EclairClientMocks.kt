@@ -17,6 +17,7 @@ class DummyEclairClient(
     private val forcecloseResponse: String = validForceCloseResponse,
     private val updateRelayFeeResponse: String = validUpdateRelayFeeResponse,
     private val peersResponse: String = validPeersResponse,
+    private val nodesResponse: String = validNodesResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -68,6 +69,8 @@ class DummyEclairClient(
 
     override suspend fun peers(): Either<ApiError, String> = Either.Right(peersResponse)
 
+    override suspend fun nodes(nodeIds: List<String>?): Either<ApiError, String> = Either.Right(nodesResponse)
+
     companion object {
         val validGetInfoResponse =
             """{"version":"0.9.0","nodeId":"03e319aa4ecc7a89fb8b3feb6efe9075864b91048bff5bef14efd55a69760ddf17","alias":"alice","color":"#49daaa","features":{"activated":{"var_onion_optin":"mandatory","option_static_remotekey":"optional"},"unknown":[151,178]},"chainHash":"06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f","network":"regtest","blockHeight":107,"publicAddresses":[],"instanceId":"be74bd9a-fc54-4f24-bc41-0477c9ce2fb4"}"""
@@ -101,6 +104,71 @@ class DummyEclairClient(
       "state":"DISCONNECTED",
       "channels":1
    }
+]"""
+        val validNodesResponse = """[
+  {
+    "signature": "c466c08fa16c1810e2971de2a57ef1f9e5e13d36a224544cf0e3d621030b9e617652b88fb2024bfdc60066ca63b4f67504f154e8fee7f13bc39739b76cc4419f",
+    "features": {
+      "activated": {
+        "option_onion_messages": "optional",
+        "gossip_queries_ex": "optional",
+        "option_data_loss_protect": "optional",
+        "var_onion_optin": "mandatory",
+        "option_static_remotekey": "optional",
+        "option_support_large_channel": "optional",
+        "option_anchors_zero_fee_htlc_tx": "optional",
+        "payment_secret": "mandatory",
+        "option_shutdown_anysegwit": "optional",
+        "option_channel_type": "optional",
+        "basic_mpp": "optional",
+        "gossip_queries": "optional"
+      },
+      "unknown": []
+    },
+    "timestamp": {
+      "iso": "2022-02-01T12:27:19Z",
+      "unix": 1643718439
+    },
+    "nodeId": "028e2403fbfddb3d787843361f91adbda64c6f622921b19fb48f5766508bcadb29",
+    "rgbColor": "#49daaa",
+    "alias": "alice",
+    "addresses": [
+      "138.229.205.237:9735"
+    ],
+    "tlvStream": {}
+  },
+  {
+    "signature": "f6cce33383fe1291fa60cfa7d9efa4a45c081396e445e9cadc825ab695aab30308a68733d27fc54a5c46b888bdddd467f30f2f5441e95c2920b3b6c54decc3a1",
+    "features": {
+      "activated": {
+        "option_onion_messages": "optional",
+        "gossip_queries_ex": "optional",
+        "option_data_loss_protect": "optional",
+        "var_onion_optin": "mandatory",
+        "option_static_remotekey": "optional",
+        "option_support_large_channel": "optional",
+        "option_anchors_zero_fee_htlc_tx": "optional",
+        "payment_secret": "mandatory",
+        "option_shutdown_anysegwit": "optional",
+        "option_channel_type": "optional",
+        "basic_mpp": "optional",
+        "gossip_queries": "optional"
+      },
+      "unknown": []
+    },
+    "timestamp": {
+      "iso": "2022-02-01T12:27:19Z",
+      "unix": 1643718439
+    },
+    "nodeId": "02fe677ac8cd61399d097535a3e8a51a0849e57cdbab9b34796c86f3e33568cbe2",
+    "rgbColor": "#49daaa",
+    "alias": "bob",
+    "addresses": [
+      "95.216.16.21:9735",
+      "[2a01:4f9:2a:106a:0:0:0:2]:9736"
+    ],
+    "tlvStream": {}
+  }
 ]"""
     }
 }
@@ -155,4 +223,6 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
     ): Either<ApiError, String> = Either.Left(error)
 
     override suspend fun peers(): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun nodes(nodeIds: List<String>?): Either<ApiError, String> = Either.Left(error)
 }
