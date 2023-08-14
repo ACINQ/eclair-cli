@@ -22,6 +22,7 @@ fun main(args: Array<String>) {
         UpdateRelayFeeCommand(resultWriter, apiClientBuilder),
         NodesCommand(resultWriter, apiClientBuilder),
         NodeCommand(resultWriter, apiClientBuilder),
+        AllChannelsCommand(resultWriter, apiClientBuilder),
     )
     parser.parse(args)
 }

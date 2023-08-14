@@ -19,6 +19,7 @@ class DummyEclairClient(
     private val peersResponse: String = validPeersResponse,
     private val nodesResponse: String = validNodesResponse,
     private val nodeResponse: String = validNodeResponse,
+    private val allChannelsResponse: String = validAllChannelsResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -74,6 +75,7 @@ class DummyEclairClient(
 
     override suspend fun node(nodeId: String): Either<ApiError, String> = Either.Right(nodeResponse)
 
+    override suspend fun allchannels(): Either<ApiError, String> = Either.Right(allChannelsResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -211,6 +213,18 @@ class DummyEclairClient(
   }
 }
 """
+        val validAllChannelsResponse = """[
+  {
+    "shortChannelId": "508856x657x0",
+    "a": "0206c7b60457550f512d80ecdd9fb6eb798ce7e91bf6ec08ad9c53d72e94ef620d",
+    "b": "02f6725f9c1c40333b67faea92fd211c183050f28df32cac3f9d69685fe9665432"
+  },
+  {
+    "shortChannelId": "512733x303x0",
+    "a": "024bd94f0425590434538fd21d4e58982f7e9cfd8f339205a73deb9c0e0341f5bd",
+    "b": "02eae56f155bae8a8eaab82ddc6fef04d5a79a6b0b0d7bcdd0b60d52f3015af031"
+  }
+]"""
     }
 }
 
@@ -268,4 +282,6 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
     override suspend fun nodes(nodeIds: List<String>?): Either<ApiError, String> = Either.Left(error)
 
     override suspend fun node(nodeId: String): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun allchannels(): Either<ApiError, String> = Either.Left(error)
 }

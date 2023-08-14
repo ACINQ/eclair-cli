@@ -61,3 +61,10 @@ data class Timestamp(
 data class NodeCommandResponse(
     val announcement: Node
 ) : EclairApiType()
+
+@Serializable
+data class AllChannels(
+    val shortChannelId: String,
+    val a: String,
+    val b: String
+)
