@@ -18,6 +18,7 @@ class DummyEclairClient(
     private val updateRelayFeeResponse: String = validUpdateRelayFeeResponse,
     private val peersResponse: String = validPeersResponse,
     private val nodesResponse: String = validNodesResponse,
+    private val nodeResponse: String = validNodeResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -70,6 +71,9 @@ class DummyEclairClient(
     override suspend fun peers(): Either<ApiError, String> = Either.Right(peersResponse)
 
     override suspend fun nodes(nodeIds: List<String>?): Either<ApiError, String> = Either.Right(nodesResponse)
+
+    override suspend fun node(nodeId: String): Either<ApiError, String> = Either.Right(nodeResponse)
+
 
     companion object {
         val validGetInfoResponse =
@@ -170,6 +174,43 @@ class DummyEclairClient(
     "tlvStream": {}
   }
 ]"""
+        val validNodeResponse = """{
+  "type": "types.NodeCommandResponse",
+  "announcement": {
+    "signature": "327c3bd0933e98bd5e65d24e1e1f6aae310f8c1606544dba6cb587b95542d9111eb9abf0a34283ef007e04ed7b003bef3bdb74896a8e34fe86b0fb0734f7efc7",
+    "features": {
+      "activated": {
+        "gossip_queries_ex": "optional",
+        "option_data_loss_protect": "optional",
+        "var_onion_optin": "mandatory",
+        "option_static_remotekey": "optional",
+        "option_scid_alias": "optional",
+        "option_onion_messages": "optional",
+        "option_support_large_channel": "optional",
+        "option_anchors_zero_fee_htlc_tx": "optional",
+        "payment_secret": "mandatory",
+        "option_shutdown_anysegwit": "optional",
+        "option_channel_type": "optional",
+        "basic_mpp": "optional",
+        "gossip_queries": "optional"
+      },
+      "unknown": [
+      ]
+    },
+    "timestamp": {
+      "iso": "2023-08-14T10:27:13Z",
+      "unix": 1692008833
+    },
+    "nodeId": "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e",
+    "rgbColor": "#49daaa",
+    "alias": "bob",
+    "addresses": [
+    ],
+    "tlvStream": {
+    }
+  }
+}
+"""
     }
 }
 
@@ -225,4 +266,6 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
     override suspend fun peers(): Either<ApiError, String> = Either.Left(error)
 
     override suspend fun nodes(nodeIds: List<String>?): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun node(nodeId: String): Either<ApiError, String> = Either.Left(error)
 }

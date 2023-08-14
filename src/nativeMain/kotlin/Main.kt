@@ -21,6 +21,7 @@ fun main(args: Array<String>) {
         PeersCommand(resultWriter, apiClientBuilder),
         UpdateRelayFeeCommand(resultWriter, apiClientBuilder),
         NodesCommand(resultWriter, apiClientBuilder),
+        NodeCommand(resultWriter, apiClientBuilder),
     )
     parser.parse(args)
 }

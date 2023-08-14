@@ -56,3 +56,8 @@ data class Timestamp(
     val iso: String,
     val unix: Long
 )
+
+@Serializable
+data class NodeCommandResponse(
+    val announcement: Node
+) : EclairApiType()
