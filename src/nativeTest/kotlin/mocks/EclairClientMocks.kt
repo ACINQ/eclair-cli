@@ -22,6 +22,7 @@ class DummyEclairClient(
     private val allChannelsResponse: String = validAllChannelsResponse,
     private val allUpdatesResponse: String = validAllUpdatesResponse,
     private val createInvoiceResponse: String = validCreateInvoiceResponse,
+    private val deleteInvoiceResponse: String = validDeleteInvoiceResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -89,6 +90,8 @@ class DummyEclairClient(
         fallbackAddress: String?,
         paymentPreimage: String?
     ): Either<ApiError, String> = Either.Right(createInvoiceResponse)
+
+    override suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String> = Either.Right(deleteInvoiceResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -306,6 +309,7 @@ class DummyEclairClient(
   },
   "routingInfo": []
 }"""
+        val validDeleteInvoiceResponse = "deleted invoice 6f0864735283ca95eaf9c50ef77893f55ee3dd11cb90710cbbfb73f018798a68"
     }
 }
 
@@ -376,4 +380,6 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
         fallbackAddress: String?,
         paymentPreimage: String?
     ): Either<ApiError, String>  = Either.Left(error)
+
+    override suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String> = Either.Left(error)
 }

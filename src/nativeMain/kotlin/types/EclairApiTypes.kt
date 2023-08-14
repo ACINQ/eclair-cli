@@ -106,3 +106,6 @@ data class CreateInvoiceResponse(
     val features: Features,
     val routingInfo: List<@Contextual Any>
 ) : EclairApiType()
+
+@Serializable
+data class DeleteInvoiceResult(val success: Boolean, val message: String) : EclairApiType()

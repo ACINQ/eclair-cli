@@ -93,6 +93,8 @@ interface IEclairClient {
         fallbackAddress: String?,
         paymentPreimage: String?,
     ): Either<ApiError, String>
+
+    suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -434,6 +436,23 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
             )
             when (response.status) {
                 HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/deleteinvoice",
+                formParameters = Parameters.build {
+                    append("paymentHash", paymentHash)
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
         } catch (e: Throwable) {
