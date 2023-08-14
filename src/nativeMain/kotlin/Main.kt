@@ -24,6 +24,7 @@ fun main(args: Array<String>) {
         NodeCommand(resultWriter, apiClientBuilder),
         AllChannelsCommand(resultWriter, apiClientBuilder),
         AllUpdatesCommand(resultWriter, apiClientBuilder),
+        CreateInvoiceCommand(resultWriter, apiClientBuilder),
     )
     parser.parse(args)
 }

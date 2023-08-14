@@ -90,3 +90,19 @@ data class ChannelFlags(
     val isEnabled: Boolean,
     val isNode1: Boolean
 )
+
+@Serializable
+data class CreateInvoiceResponse(
+    val prefix: String,
+    val timestamp: Long,
+    val nodeId: String,
+    val serialized: String,
+    val description: String,
+    val paymentHash: String,
+    val paymentMetadata: String,
+    val expiry: Int,
+    val minFinalCltvExpiry: Int,
+    val amount: Long,
+    val features: Features,
+    val routingInfo: List<@Contextual Any>
+) : EclairApiType()

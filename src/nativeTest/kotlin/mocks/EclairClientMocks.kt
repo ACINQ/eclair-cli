@@ -21,6 +21,7 @@ class DummyEclairClient(
     private val nodeResponse: String = validNodeResponse,
     private val allChannelsResponse: String = validAllChannelsResponse,
     private val allUpdatesResponse: String = validAllUpdatesResponse,
+    private val createInvoiceResponse: String = validCreateInvoiceResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -79,6 +80,15 @@ class DummyEclairClient(
     override suspend fun allchannels(): Either<ApiError, String> = Either.Right(allChannelsResponse)
 
     override suspend fun allupdates(nodeId: String?): Either<ApiError, String> = Either.Right(allUpdatesResponse)
+
+    override suspend fun createinvoice(
+        description: String?,
+        descriptionHash: String?,
+        amountMsat: Int?,
+        expireIn: Int?,
+        fallbackAddress: String?,
+        paymentPreimage: String?
+    ): Either<ApiError, String> = Either.Right(createInvoiceResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -274,6 +284,28 @@ class DummyEclairClient(
     "tlvStream": {}
   }
 ]"""
+        val validCreateInvoiceResponse = """{
+  "prefix": "lnbcrt",
+  "timestamp": 1643718891,
+  "nodeId": "028e2403fbfddb3d787843361f91adbda64c6f622921b19fb48f5766508bcadb29",
+  "serialized": "lnbcrt500n1pslj28tpp55kxmmddatrnmf42a55mk4wzz4ryq8tv2vwrrarj27e0hhjgpscjqdq0ydex2cmtd3jhxucsp5qu6jq5heq4lcjpj2r8gp0sd65860yzc5yw3xrwde6c4m3mlessxsmqz9gxqrrsscqp79qtzsqqqqqysgqr2fy2yz4655hwql2nwkk3t9saxhj80340cxfzf7fwhweasncv77ym7wcv0p54e4kt7jpmfdavnj5urq84syh9t2t49qdgj4ra8jl40gp6ys45n",
+  "description": "#reckless",
+  "paymentHash": "a58dbdb5bd58e7b4d55da5376ab842a8c803ad8a63863e8e4af65f7bc9018624",
+  "paymentMetadata": "2a",
+  "expiry": 3600,
+  "minFinalCltvExpiry": 30,
+  "amount": 50000,
+  "features": {
+    "activated": {
+      "payment_secret": "mandatory",
+      "basic_mpp": "optional",
+      "option_payment_metadata": "optional",
+      "var_onion_optin": "mandatory"
+    },
+    "unknown": []
+  },
+  "routingInfo": []
+}"""
     }
 }
 
@@ -335,4 +367,13 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
     override suspend fun allchannels(): Either<ApiError, String> = Either.Left(error)
 
     override suspend fun allupdates(nodeId: String?): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun createinvoice(
+        description: String?,
+        descriptionHash: String?,
+        amountMsat: Int?,
+        expireIn: Int?,
+        fallbackAddress: String?,
+        paymentPreimage: String?
+    ): Either<ApiError, String>  = Either.Left(error)
 }
