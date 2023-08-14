@@ -16,7 +16,8 @@ fun main(args: Array<String>) {
         RbfOpenCommand(resultWriter, apiClientBuilder),
         CpfpBumpFeesCommand(resultWriter, apiClientBuilder),
         CloseCommand(resultWriter, apiClientBuilder),
-        ForceCloseCommand(resultWriter, apiClientBuilder)
+        ForceCloseCommand(resultWriter, apiClientBuilder),
+        UpdateRelayFeeCommand(resultWriter, apiClientBuilder)
     )
     parser.parse(args)
 }
