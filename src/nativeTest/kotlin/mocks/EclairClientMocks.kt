@@ -20,6 +20,7 @@ class DummyEclairClient(
     private val nodesResponse: String = validNodesResponse,
     private val nodeResponse: String = validNodeResponse,
     private val allChannelsResponse: String = validAllChannelsResponse,
+    private val allUpdatesResponse: String = validAllUpdatesResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -76,6 +77,8 @@ class DummyEclairClient(
     override suspend fun node(nodeId: String): Either<ApiError, String> = Either.Right(nodeResponse)
 
     override suspend fun allchannels(): Either<ApiError, String> = Either.Right(allChannelsResponse)
+
+    override suspend fun allupdates(nodeId: String?): Either<ApiError, String> = Either.Right(allUpdatesResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -225,6 +228,52 @@ class DummyEclairClient(
     "b": "02eae56f155bae8a8eaab82ddc6fef04d5a79a6b0b0d7bcdd0b60d52f3015af031"
   }
 ]"""
+        val validAllUpdatesResponse = """[
+  {
+    "signature": "02bbe4ee3f128ba044937428680d266c71231fd02d899c446aad498ca095610133f7c2ddb68ed0d8d29961d0962651556dc08b5cb00fb56055d2b98407f4addb",
+    "chainHash": "06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f",
+    "shortChannelId": "2899x1x1",
+    "timestamp": {
+      "iso": "2022-02-01T12:27:50Z",
+      "unix": 1643718470
+    },
+    "messageFlags": {
+      "dontForward": false
+    },
+    "channelFlags": {
+      "isEnabled": true,
+      "isNode1": true
+    },
+    "cltvExpiryDelta": 48,
+    "htlcMinimumMsat": 1,
+    "feeBaseMsat": 5,
+    "feeProportionalMillionths": 150,
+    "htlcMaximumMsat": 450000000,
+    "tlvStream": {}
+  },
+  {
+    "signature": "1da0e7094424c0daa64fe8427e191095d14285dd9346f37d014d07d8857b53cc6bed703d22794ddbfc1945cf5bdb7566137441964e01f8facc30c17fd0dffa06",
+    "chainHash": "06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f",
+    "shortChannelId": "2899x1x1",
+    "timestamp": {
+      "iso": "2022-02-01T12:27:19Z",
+      "unix": 1643718439
+    },
+    "messageFlags": {
+      "dontForward": false
+    },
+    "channelFlags": {
+      "isEnabled": false,
+      "isNode1": false
+    },
+    "cltvExpiryDelta": 48,
+    "htlcMinimumMsat": 1,
+    "feeBaseMsat": 1000,
+    "feeProportionalMillionths": 200,
+    "htlcMaximumMsat": 450000000,
+    "tlvStream": {}
+  }
+]"""
     }
 }
 
@@ -284,4 +333,6 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
     override suspend fun node(nodeId: String): Either<ApiError, String> = Either.Left(error)
 
     override suspend fun allchannels(): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun allupdates(nodeId: String?): Either<ApiError, String> = Either.Left(error)
 }

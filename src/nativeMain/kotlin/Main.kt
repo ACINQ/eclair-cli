@@ -23,6 +23,7 @@ fun main(args: Array<String>) {
         NodesCommand(resultWriter, apiClientBuilder),
         NodeCommand(resultWriter, apiClientBuilder),
         AllChannelsCommand(resultWriter, apiClientBuilder),
+        AllUpdatesCommand(resultWriter, apiClientBuilder),
     )
     parser.parse(args)
 }

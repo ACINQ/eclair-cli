@@ -68,3 +68,25 @@ data class AllChannels(
     val a: String,
     val b: String
 )
+
+@Serializable
+data class AllUpdates(
+    val signature: String,
+    val chainHash: String,
+    val shortChannelId: String,
+    val timestamp: Timestamp,
+    val messageFlags: Map<String, Boolean>,
+    val channelFlags: ChannelFlags,
+    val cltvExpiryDelta: Int,
+    val htlcMinimumMsat: Int,
+    val feeBaseMsat: Int,
+    val feeProportionalMillionths: Int,
+    val htlcMaximumMsat: Long,
+    val tlvStream: Map<String, @Contextual Any>
+)
+
+@Serializable
+data class ChannelFlags(
+    val isEnabled: Boolean,
+    val isNode1: Boolean
+)
