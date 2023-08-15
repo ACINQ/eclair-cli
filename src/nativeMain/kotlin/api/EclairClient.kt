@@ -97,6 +97,17 @@ interface IEclairClient {
     suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String>
 
     suspend fun parseinvoice(invoice: String): Either<ApiError, String>
+
+    suspend fun payinvoice(
+        invoice: String,
+        amountMsat: Int?,
+        maxAttempts: Int?,
+        maxFeeFlatSat: Int?,
+        maxFeePct: Int?,
+        externalId: String?,
+        pathFindingExperimentName: String?,
+        blocking: Boolean?,
+    ): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -476,6 +487,39 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
             }
         } catch (e: Throwable) {
             Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun payinvoice(
+        invoice: String,
+        amountMsat: Int?,
+        maxAttempts: Int?,
+        maxFeeFlatSat: Int?,
+        maxFeePct: Int?,
+        externalId: String?,
+        pathFindingExperimentName: String?,
+        blocking: Boolean?
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "${apiHost}/payinvoice",
+                formParameters = Parameters.build {
+                    append("invoice", invoice)
+                    amountMsat?.let { append("amountMsat", it.toString()) }
+                    maxAttempts?.let { append("maxAttempts", it.toString()) }
+                    maxFeeFlatSat?.let { append("maxFeeFlatSat", it.toString()) }
+                    maxFeePct?.let { append("maxFeePct", it.toString()) }
+                    externalId?.let { append("externalId", it) }
+                    pathFindingExperimentName?.let { append("pathFindingExperimentName", it) }
+                    blocking?.let { append("blocking", it.toString()) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown error"))
         }
     }
 }

@@ -27,6 +27,7 @@ fun main(args: Array<String>) {
         CreateInvoiceCommand(resultWriter, apiClientBuilder),
         DeleteInvoiceCommand(resultWriter, apiClientBuilder),
         ParseInvoiceCommand(resultWriter, apiClientBuilder),
+        PayInvoiceCommand(resultWriter, apiClientBuilder),
     )
     parser.parse(args)
 }

@@ -24,6 +24,7 @@ class DummyEclairClient(
     private val createInvoiceResponse: String = validCreateInvoiceResponse,
     private val deleteInvoiceResponse: String = validDeleteInvoiceResponse,
     private val parseInvoiceResponse: String = validParseInvoiceResponse,
+    private val payInvoiceResponse: String = validPayInvoiceResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -95,6 +96,17 @@ class DummyEclairClient(
     override suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String> = Either.Right(deleteInvoiceResponse)
 
     override suspend fun parseinvoice(invoice: String): Either<ApiError, String> = Either.Right(parseInvoiceResponse)
+
+    override suspend fun payinvoice(
+        invoice: String,
+        amountMsat: Int?,
+        maxAttempts: Int?,
+        maxFeeFlatSat: Int?,
+        maxFeePct: Int?,
+        externalId: String?,
+        pathFindingExperimentName: String?,
+        blocking: Boolean?
+    ): Either<ApiError, String> = Either.Right(payInvoiceResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -335,6 +347,7 @@ class DummyEclairClient(
   },
   "routingInfo": []
 }"""
+        val validPayInvoiceResponse = "e4227601-38b3-404e-9aa0-75a829e9bec0"
     }
 }
 
@@ -404,9 +417,20 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
         expireIn: Int?,
         fallbackAddress: String?,
         paymentPreimage: String?
-    ): Either<ApiError, String>  = Either.Left(error)
+    ): Either<ApiError, String> = Either.Left(error)
 
     override suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String> = Either.Left(error)
 
     override suspend fun parseinvoice(invoice: String): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun payinvoice(
+        invoice: String,
+        amountMsat: Int?,
+        maxAttempts: Int?,
+        maxFeeFlatSat: Int?,
+        maxFeePct: Int?,
+        externalId: String?,
+        pathFindingExperimentName: String?,
+        blocking: Boolean?
+    ): Either<ApiError, String> = Either.Left(error)
 }

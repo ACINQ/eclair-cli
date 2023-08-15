@@ -109,3 +109,6 @@ data class Invoice(
 
 @Serializable
 data class DeleteInvoiceResult(val success: Boolean, val message: String) : EclairApiType()
+
+@Serializable
+data class InvoiceResult(val success: Boolean, val message: String) : EclairApiType()
