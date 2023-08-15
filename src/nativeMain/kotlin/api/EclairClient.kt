@@ -118,6 +118,19 @@ interface IEclairClient {
         externalId: String?,
         pathFindingExperimentName: String?,
     ): Either<ApiError, String>
+
+    suspend fun sendtoroute(
+        invoice: String,
+        nodeIds: List<String>?,
+        shortChannelIds: List<String>?,
+        amountMsat: Int,
+        paymentHash: String,
+        finalCltvExpiry: Int,
+        maxFeeMsat: Int?,
+        recipientAmountMsat: Int?,
+        parentId: String?,
+        externalId: String?
+    ): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -561,6 +574,43 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
             }
         } catch (e: Throwable) {
             Either.Left(ApiError(0, e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun sendtoroute(
+        invoice: String,
+        nodeIds: List<String>?,
+        shortChannelIds: List<String>?,
+        amountMsat: Int,
+        paymentHash: String,
+        finalCltvExpiry: Int,
+        maxFeeMsat: Int?,
+        recipientAmountMsat: Int?,
+        parentId: String?,
+        externalId: String?
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/sendtoroute",
+                formParameters = Parameters.build {
+                    append("invoice", invoice)
+                    nodeIds?.let { append("nodeIds", it.joinToString(",")) }
+                    shortChannelIds?.let { append("shortChannelIds", it.joinToString(",")) }
+                    append("amountMsat", amountMsat.toString())
+                    append("paymentHash", paymentHash)
+                    append("finalCltvExpiry", finalCltvExpiry.toString())
+                    maxFeeMsat?.let { append("maxFeeMsat", it.toString()) }
+                    recipientAmountMsat?.let { append("recipientAmountMsat", it.toString()) }
+                    parentId?.let { append("parentId", it) }
+                    externalId?.let { append("externalId", it) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
         }
     }
 }

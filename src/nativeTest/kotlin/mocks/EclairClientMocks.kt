@@ -26,6 +26,7 @@ class DummyEclairClient(
     private val parseInvoiceResponse: String = validParseInvoiceResponse,
     private val payInvoiceResponse: String = validPayInvoiceResponse,
     private val sendToNodeResponse: String = validSendToNodeResponse,
+    private val sendToRouteResponse: String = validSendToRouteResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -118,6 +119,19 @@ class DummyEclairClient(
         externalId: String?,
         pathFindingExperimentName: String?
     ): Either<ApiError, String> = Either.Right(sendToNodeResponse)
+
+    override suspend fun sendtoroute(
+        invoice: String,
+        nodeIds: List<String>?,
+        shortChannelIds: List<String>?,
+        amountMsat: Int,
+        paymentHash: String,
+        finalCltvExpiry: Int,
+        maxFeeMsat: Int?,
+        recipientAmountMsat: Int?,
+        parentId: String?,
+        externalId: String?
+    ): Either<ApiError, String> = Either.Right(sendToRouteResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -361,6 +375,11 @@ class DummyEclairClient(
         val validPayInvoiceResponse = "e4227601-38b3-404e-9aa0-75a829e9bec0"
 
         val validSendToNodeResponse = "e4227601-38b3-404e-9aa0-75a829e9bec0"
+
+        val validSendToRouteResponse = """{
+  "paymentId": "15798966-5e95-4dce-84a0-825bd2f2a8d1",
+  "parentId": "20b2a854-261a-4e9f-a4ca-59b381aee4bc"
+}"""
     }
 }
 
@@ -455,5 +474,18 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
         maxFeePct: Int?,
         externalId: String?,
         pathFindingExperimentName: String?
+    ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun sendtoroute(
+        invoice: String,
+        nodeIds: List<String>?,
+        shortChannelIds: List<String>?,
+        amountMsat: Int,
+        paymentHash: String,
+        finalCltvExpiry: Int,
+        maxFeeMsat: Int?,
+        recipientAmountMsat: Int?,
+        parentId: String?,
+        externalId: String?
     ): Either<ApiError, String> = Either.Left(error)
 }

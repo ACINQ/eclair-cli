@@ -19,7 +19,7 @@ _eclair_cli() {
     # `_init_completion` is a helper function provided by the Bash-completion package.
     _init_completion || return
 
-    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers nodes node allchannels allupdates createinvoice deleteinvoice parseinvoice payinvoice sendtonode"
+    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers nodes node allchannels allupdates createinvoice deleteinvoice parseinvoice payinvoice sendtonode sendtoroute"
     local common_opts="-p --host"
     local connect_opts="--uri --nodeId --address --port"
     local disconnect_opts="--nodeId"
@@ -37,8 +37,8 @@ _eclair_cli() {
     local parseinvoice_opts="--invoice"
     local payinvoice_opts="--invoice --amountMsat --maxAttempts --maxFeeFlatSat --maxFeePct --externalId --pathFindingExperimentName --blocking"
     local sendtonode_opts="--nodeId --amountMsat --maxAttempts --maxFeeFlatSat --maxFeePct --externalId --pathFindingExperimentName"
-
-	# If the current word starts with a dash (-), it's an option rather than a command
+    local sendtoroute_opts="--invoice --nodeIds --shortChannelIds --amountMsat --paymentHash --finalCltvExpiry --maxFeeMsat --recipientAmountMsat --parentId --externalId"
+    	# If the current word starts with a dash (-), it's an option rather than a command
      if [[ ${cur} == -* ]]; then
         local cmd=""
         for ((i=$cword; i>0; i--)); do
@@ -98,6 +98,9 @@ _eclair_cli() {
                 ;;
             sendtonode)
                 COMPREPLY=( $(compgen -W "${sendtonode_opts} ${common_opts}" -- ${cur}) )
+                ;;
+            sendtoroute)
+                COMPREPLY=( $(compgen -W "${sendtoroute_opts} ${common_opts}" -- ${cur}) )
                 ;;
             *)
                 COMPREPLY=( $(compgen -W "${common_opts}" -- ${cur}) )

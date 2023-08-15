@@ -112,3 +112,9 @@ data class DeleteInvoiceResult(val success: Boolean, val message: String) : Ecla
 
 @Serializable
 data class InvoiceResult(val success: Boolean, val message: String) : EclairApiType()
+
+@Serializable
+data class RouteResult(
+    val paymentId: String,
+    val parentId: String
+) : EclairApiType()

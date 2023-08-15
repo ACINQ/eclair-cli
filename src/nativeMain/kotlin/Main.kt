@@ -29,6 +29,7 @@ fun main(args: Array<String>) {
         ParseInvoiceCommand(resultWriter, apiClientBuilder),
         PayInvoiceCommand(resultWriter, apiClientBuilder),
         SendToNodeCommand(resultWriter, apiClientBuilder),
+        SendToRouteCommand(resultWriter, apiClientBuilder),
     )
     parser.parse(args)
 }
