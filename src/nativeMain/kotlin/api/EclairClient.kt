@@ -108,6 +108,16 @@ interface IEclairClient {
         pathFindingExperimentName: String?,
         blocking: Boolean?,
     ): Either<ApiError, String>
+
+    suspend fun sendtonode(
+        nodeId: String,
+        amountMsat: Int,
+        maxAttempts: Int?,
+        maxFeeFlatSat: Int?,
+        maxFeePct: Int?,
+        externalId: String?,
+        pathFindingExperimentName: String?,
+    ): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -512,6 +522,37 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                     externalId?.let { append("externalId", it) }
                     pathFindingExperimentName?.let { append("pathFindingExperimentName", it) }
                     blocking?.let { append("blocking", it.toString()) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun sendtonode(
+        nodeId: String,
+        amountMsat: Int,
+        maxAttempts: Int?,
+        maxFeeFlatSat: Int?,
+        maxFeePct: Int?,
+        externalId: String?,
+        pathFindingExperimentName: String?,
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "${apiHost}/sendtonode",
+                formParameters = Parameters.build {
+                    append("nodeId", nodeId)
+                    append("amountMsat", amountMsat.toString())
+                    maxAttempts?.let { append("maxAttempts", it.toString()) }
+                    maxFeeFlatSat?.let { append("maxFeeFlatSat", it.toString()) }
+                    maxFeePct?.let { append("maxFeePct", it.toString()) }
+                    externalId?.let { append("externalId", it) }
+                    pathFindingExperimentName?.let { append("pathFindingExperimentName", it) }
                 }
             )
             when (response.status) {

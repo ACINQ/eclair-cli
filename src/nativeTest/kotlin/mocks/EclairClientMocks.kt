@@ -25,6 +25,7 @@ class DummyEclairClient(
     private val deleteInvoiceResponse: String = validDeleteInvoiceResponse,
     private val parseInvoiceResponse: String = validParseInvoiceResponse,
     private val payInvoiceResponse: String = validPayInvoiceResponse,
+    private val sendToNodeResponse: String = validSendToNodeResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -107,6 +108,16 @@ class DummyEclairClient(
         pathFindingExperimentName: String?,
         blocking: Boolean?
     ): Either<ApiError, String> = Either.Right(payInvoiceResponse)
+
+    override suspend fun sendtonode(
+        nodeId: String,
+        amountMsat: Int,
+        maxAttempts: Int?,
+        maxFeeFlatSat: Int?,
+        maxFeePct: Int?,
+        externalId: String?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> = Either.Right(sendToNodeResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -348,6 +359,8 @@ class DummyEclairClient(
   "routingInfo": []
 }"""
         val validPayInvoiceResponse = "e4227601-38b3-404e-9aa0-75a829e9bec0"
+
+        val validSendToNodeResponse = "e4227601-38b3-404e-9aa0-75a829e9bec0"
     }
 }
 
@@ -432,5 +445,15 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
         externalId: String?,
         pathFindingExperimentName: String?,
         blocking: Boolean?
+    ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun sendtonode(
+        nodeId: String,
+        amountMsat: Int,
+        maxAttempts: Int?,
+        maxFeeFlatSat: Int?,
+        maxFeePct: Int?,
+        externalId: String?,
+        pathFindingExperimentName: String?
     ): Either<ApiError, String> = Either.Left(error)
 }

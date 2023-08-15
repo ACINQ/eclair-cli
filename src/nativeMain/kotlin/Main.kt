@@ -28,6 +28,7 @@ fun main(args: Array<String>) {
         DeleteInvoiceCommand(resultWriter, apiClientBuilder),
         ParseInvoiceCommand(resultWriter, apiClientBuilder),
         PayInvoiceCommand(resultWriter, apiClientBuilder),
+        SendToNodeCommand(resultWriter, apiClientBuilder),
     )
     parser.parse(args)
 }
