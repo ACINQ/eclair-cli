@@ -17,7 +17,8 @@ fun main(args: Array<String>) {
         CpfpBumpFeesCommand(resultWriter, apiClientBuilder),
         CloseCommand(resultWriter, apiClientBuilder),
         ForceCloseCommand(resultWriter, apiClientBuilder),
-        UpdateRelayFeeCommand(resultWriter, apiClientBuilder)
+        UpdateRelayFeeCommand(resultWriter, apiClientBuilder),
+        PeersCommand(resultWriter, apiClientBuilder)
     )
     parser.parse(args)
 }
