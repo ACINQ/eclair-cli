@@ -90,3 +90,77 @@ data class ChannelFlags(
     val isEnabled: Boolean,
     val isNode1: Boolean
 )
+
+@Serializable
+data class Invoice(
+    val prefix: String,
+    val timestamp: Long,
+    val nodeId: String,
+    val serialized: String,
+    val description: String,
+    val paymentHash: String,
+    val paymentMetadata: String,
+    val expiry: Int,
+    val minFinalCltvExpiry: Int,
+    val amount: Long? = null,
+    val features: Features,
+    val routingInfo: List<@Contextual Any>
+) : EclairApiType()
+
+@Serializable
+data class DeleteInvoiceResult(val success: Boolean, val message: String) : EclairApiType()
+
+@Serializable
+data class InvoiceResult(val success: Boolean, val message: String) : EclairApiType()
+
+@Serializable
+data class RouteResult(
+    val paymentId: String,
+    val parentId: String
+) : EclairApiType()
+
+@Serializable
+data class SentInfoResponse(
+    val id: String,
+    val parentId: String,
+    val paymentHash: String,
+    val paymentType: String,
+    val amount: Long,
+    val recipientAmount: Long,
+    val recipientNodeId: String,
+    val createdAt: Timestamp,
+    val invoice: Invoice,
+    val status: PaymentStatus
+)
+
+@Serializable
+data class PaymentStatus(
+    val type: String,
+    val paymentPreimage: String,
+    val feesPaid: Long,
+    val route: List<Route>,
+    val completedAt: Timestamp
+)
+
+@Serializable
+data class Route(
+    val nodeId: String,
+    val nextNodeId: String,
+    val shortChannelId: String
+)
+
+@Serializable
+data class ReceivedInfoResponse(
+    val invoice: Invoice,
+    val paymentPreimage: String,
+    val paymentType: String,
+    val createdAt: Timestamp,
+    val status: ReceivePaymentStatus
+) : EclairApiType()
+
+@Serializable
+data class ReceivePaymentStatus(
+    val type: String,
+    val amount: Long? = null,
+    val receivedAt: Timestamp? = null
+)

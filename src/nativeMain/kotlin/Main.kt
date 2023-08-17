@@ -24,6 +24,18 @@ fun main(args: Array<String>) {
         NodeCommand(resultWriter, apiClientBuilder),
         AllChannelsCommand(resultWriter, apiClientBuilder),
         AllUpdatesCommand(resultWriter, apiClientBuilder),
+        CreateInvoiceCommand(resultWriter, apiClientBuilder),
+        DeleteInvoiceCommand(resultWriter, apiClientBuilder),
+        ParseInvoiceCommand(resultWriter, apiClientBuilder),
+        PayInvoiceCommand(resultWriter, apiClientBuilder),
+        SendToNodeCommand(resultWriter, apiClientBuilder),
+        SendToRouteCommand(resultWriter, apiClientBuilder),
+        GetSentInfoCommand(resultWriter, apiClientBuilder),
+        GetReceivedInfoCommand(resultWriter, apiClientBuilder),
+        ListReceivedPaymentsCommand(resultWriter, apiClientBuilder),
+        GetInvoiceCommand(resultWriter, apiClientBuilder),
+        ListInvoicesCommand(resultWriter, apiClientBuilder),
+        ListPendingInvoicesCommand(resultWriter, apiClientBuilder)
     )
     parser.parse(args)
 }

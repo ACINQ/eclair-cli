@@ -21,6 +21,18 @@ class DummyEclairClient(
     private val nodeResponse: String = validNodeResponse,
     private val allChannelsResponse: String = validAllChannelsResponse,
     private val allUpdatesResponse: String = validAllUpdatesResponse,
+    private val createInvoiceResponse: String = validCreateInvoiceResponse,
+    private val deleteInvoiceResponse: String = validDeleteInvoiceResponse,
+    private val parseInvoiceResponse: String = validParseInvoiceResponse,
+    private val payInvoiceResponse: String = validPayInvoiceResponse,
+    private val sendToNodeResponse: String = validSendToNodeResponse,
+    private val sendToRouteResponse: String = validSendToRouteResponse,
+    private val getsentinfoResponse: String = validGetSentInfoResponse,
+    private val getreceivedinfoResponse: String = validGetReceivedInfoResponse,
+    private val listreceivedpaymentsResponse: String = validListReceivedPaymentsResponse,
+    private val getinvoiceResponse: String = validGetInvoiceResponse,
+    private val listinvoicesResponse: String = validListInvoicesResponse,
+    private val listpendinginvoicesResponse: String = validListPendingInvoicesResponse
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -79,6 +91,83 @@ class DummyEclairClient(
     override suspend fun allchannels(): Either<ApiError, String> = Either.Right(allChannelsResponse)
 
     override suspend fun allupdates(nodeId: String?): Either<ApiError, String> = Either.Right(allUpdatesResponse)
+
+    override suspend fun createinvoice(
+        description: String?,
+        descriptionHash: String?,
+        amountMsat: Int?,
+        expireIn: Int?,
+        fallbackAddress: String?,
+        paymentPreimage: String?
+    ): Either<ApiError, String> = Either.Right(createInvoiceResponse)
+
+    override suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String> = Either.Right(deleteInvoiceResponse)
+
+    override suspend fun parseinvoice(invoice: String): Either<ApiError, String> = Either.Right(parseInvoiceResponse)
+
+    override suspend fun payinvoice(
+        invoice: String,
+        amountMsat: Int?,
+        maxAttempts: Int?,
+        maxFeeFlatSat: Int?,
+        maxFeePct: Int?,
+        externalId: String?,
+        pathFindingExperimentName: String?,
+        blocking: Boolean?
+    ): Either<ApiError, String> = Either.Right(payInvoiceResponse)
+
+    override suspend fun sendtonode(
+        nodeId: String,
+        amountMsat: Int,
+        maxAttempts: Int?,
+        maxFeeFlatSat: Int?,
+        maxFeePct: Int?,
+        externalId: String?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> = Either.Right(sendToNodeResponse)
+
+    override suspend fun sendtoroute(
+        invoice: String,
+        nodeIds: List<String>?,
+        shortChannelIds: List<String>?,
+        amountMsat: Int,
+        paymentHash: String,
+        finalCltvExpiry: Int,
+        maxFeeMsat: Int?,
+        recipientAmountMsat: Int?,
+        parentId: String?,
+        externalId: String?
+    ): Either<ApiError, String> = Either.Right(sendToRouteResponse)
+
+    override suspend fun getsentinfo(
+        paymentHash: String, id: String?
+    ): Either<ApiError, String> = Either.Right(getsentinfoResponse)
+
+    override suspend fun getreceivedinfo(
+        paymentHash: String?, invoice: String?
+    ): Either<ApiError, String> = Either.Right(getreceivedinfoResponse)
+
+    override suspend fun listreceivedpayments(
+        from: Int?, to: Int?, count: Int?, skip: Int?
+    ): Either<ApiError, String> = Either.Right(listreceivedpaymentsResponse)
+
+    override suspend fun getinvoice(
+        paymentHash: String
+    ): Either<ApiError, String> = Either.Right(getinvoiceResponse)
+
+    override suspend fun listinvoices(
+        from: Int?,
+        to: Int?,
+        count: Int?,
+        skip: Int?
+    ): Either<ApiError, String> = Either.Right(listinvoicesResponse)
+
+    override suspend fun listpendinginvoices(
+        from: Int?,
+        to: Int?,
+        count: Int?,
+        skip: Int?
+    ): Either<ApiError, String> = Either.Right(listpendinginvoicesResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -274,6 +363,399 @@ class DummyEclairClient(
     "tlvStream": {}
   }
 ]"""
+        val validCreateInvoiceResponse = """{
+  "prefix": "lnbcrt",
+  "timestamp": 1643718891,
+  "nodeId": "028e2403fbfddb3d787843361f91adbda64c6f622921b19fb48f5766508bcadb29",
+  "serialized": "lnbcrt500n1pslj28tpp55kxmmddatrnmf42a55mk4wzz4ryq8tv2vwrrarj27e0hhjgpscjqdq0ydex2cmtd3jhxucsp5qu6jq5heq4lcjpj2r8gp0sd65860yzc5yw3xrwde6c4m3mlessxsmqz9gxqrrsscqp79qtzsqqqqqysgqr2fy2yz4655hwql2nwkk3t9saxhj80340cxfzf7fwhweasncv77ym7wcv0p54e4kt7jpmfdavnj5urq84syh9t2t49qdgj4ra8jl40gp6ys45n",
+  "description": "#reckless",
+  "paymentHash": "a58dbdb5bd58e7b4d55da5376ab842a8c803ad8a63863e8e4af65f7bc9018624",
+  "paymentMetadata": "2a",
+  "expiry": 3600,
+  "minFinalCltvExpiry": 30,
+  "amount": 50000,
+  "features": {
+    "activated": {
+      "payment_secret": "mandatory",
+      "basic_mpp": "optional",
+      "option_payment_metadata": "optional",
+      "var_onion_optin": "mandatory"
+    },
+    "unknown": []
+  },
+  "routingInfo": []
+}"""
+        val validDeleteInvoiceResponse = "deleted invoice 6f0864735283ca95eaf9c50ef77893f55ee3dd11cb90710cbbfb73f018798a68"
+        val validParseInvoiceResponse = """{
+  "prefix": "lnbcrt",
+  "timestamp": 1643718891,
+  "nodeId": "028e2403fbfddb3d787843361f91adbda64c6f622921b19fb48f5766508bcadb29",
+  "serialized": "lnbcrt500n1pslj28tpp55kxmmddatrnmf42a55mk4wzz4ryq8tv2vwrrarj27e0hhjgpscjqdq0ydex2cmtd3jhxucsp5qu6jq5heq4lcjpj2r8gp0sd65860yzc5yw3xrwde6c4m3mlessxsmqz9gxqrrsscqp79qtzsqqqqqysgqr2fy2yz4655hwql2nwkk3t9saxhj80340cxfzf7fwhweasncv77ym7wcv0p54e4kt7jpmfdavnj5urq84syh9t2t49qdgj4ra8jl40gp6ys45n",
+  "description": "#reckless",
+  "paymentHash": "a58dbdb5bd58e7b4d55da5376ab842a8c803ad8a63863e8e4af65f7bc9018624",
+  "paymentMetadata": "2a",
+  "expiry": 3600,
+  "minFinalCltvExpiry": 30,
+  "amount": 50000,
+  "features": {
+    "activated": {
+      "payment_secret": "mandatory",
+      "basic_mpp": "optional",
+      "option_payment_metadata": "optional",
+      "var_onion_optin": "mandatory"
+    },
+    "unknown": []
+  },
+  "routingInfo": []
+}"""
+        val validPayInvoiceResponse = "e4227601-38b3-404e-9aa0-75a829e9bec0"
+        val validSendToNodeResponse = "e4227601-38b3-404e-9aa0-75a829e9bec0"
+        val validSendToRouteResponse = """{
+  "paymentId": "15798966-5e95-4dce-84a0-825bd2f2a8d1",
+  "parentId": "20b2a854-261a-4e9f-a4ca-59b381aee4bc"
+}"""
+        val validGetSentInfoResponse = """[
+  {
+    "id": "c7b83ae7-a8a2-4ac7-9d54-f13826eaaf06",
+    "parentId": "e0b98732-4ba5-4992-b1c3-5efb4084bcd3",
+    "paymentHash": "e170db22f72678848b90d4d10095e6863c79a39717ccdcfab18106248b93305c",
+    "paymentType": "Standard",
+    "amount": 2000000,
+    "recipientAmount": 5000000,
+    "recipientNodeId": "02fe677ac8cd61399d097535a3e8a51a0849e57cdbab9b34796c86f3e33568cbe2",
+    "createdAt": {
+      "iso": "2022-02-01T12:40:19.309Z",
+      "unix": 1643719219
+    },
+    "invoice": {
+      "prefix": "lnbcrt",
+      "timestamp": 1643719211,
+      "nodeId": "02fe677ac8cd61399d097535a3e8a51a0849e57cdbab9b34796c86f3e33568cbe2",
+      "serialized": "lnbcrt50u1pslj23tpp5u9cdkghhyeugfzus6ngsp90xsc78nguhzlxde743syrzfzunxpwqdq809hkcmcsp5tp7xegstgfpyjyg2cqclsthwr330g9g3p0dmn0g6v9t6dn6n9s4smqz9gxqrrsscqp79qtzsqqqqqysgq20s4qnk7xq0dcwjustztkx4ez0mqlmg83s5y6gk4u7ug6qk3cwuxq9ehqn4kyp580gqwp4nxwh598j40pqnlals2m0pem7f0qz0xm8qqe25z82",
+      "description": "#reckless",
+      "paymentHash": "e170db22f72678848b90d4d10095e6863c79a39717ccdcfab18106248b93305c",
+      "paymentMetadata": "2a",
+      "expiry": 3600,
+      "minFinalCltvExpiry": 30,
+      "amount": 5000000,
+      "features": {
+        "activated": {
+          "payment_secret": "mandatory",
+          "basic_mpp": "optional",
+          "option_payment_metadata": "optional",
+          "var_onion_optin": "mandatory"
+        },
+        "unknown": []
+      },
+      "routingInfo": []
+    },
+    "status": {
+      "type": "sent",
+      "paymentPreimage": "533b360e08d0d7383d0125e3510eaf5d7e36e21b847446cf64a84973800bc48c",
+      "feesPaid": 10,
+      "route": [
+        {
+          "nodeId": "03dfefbc942ac877655af00c4a6e9314626438e4aaba141412d825d5f2304bf0bf",
+          "nextNodeId": "02f5ce007d2d9ef8a72a03b8e33f63fe9384cea4e71c1de468737611ce3e68ac02",
+          "shortChannelId": "538x3x0"
+        },
+        {
+          "nodeId": "02f5ce007d2d9ef8a72a03b8e33f63fe9384cea4e71c1de468737611ce3e68ac02",
+          "nextNodeId": "02d150875194d076f662d4252a8dee7077ed4cc4a848bb9f83fb467b6d3c120199",
+          "shortChannelId": "538x2x1"
+        }
+      ],
+      "completedAt": {
+        "iso": "2022-02-01T12:40:19.438Z",
+        "unix": 1643719219
+      }
+    }
+  },
+  {
+    "id": "83fcc569-917a-4cac-b42d-6f6b186f21eb",
+    "parentId": "e0b98732-4ba5-4992-b1c3-5efb4084bcd3",
+    "paymentHash": "e170db22f72678848b90d4d10095e6863c79a39717ccdcfab18106248b93305c",
+    "paymentType": "Standard",
+    "amount": 3000000,
+    "recipientAmount": 5000000,
+    "recipientNodeId": "02fe677ac8cd61399d097535a3e8a51a0849e57cdbab9b34796c86f3e33568cbe2",
+    "createdAt": {
+      "iso": "2022-02-01T12:40:19.309Z",
+      "unix": 1643719219
+    },
+    "invoice": {
+      "prefix": "lnbcrt",
+      "timestamp": 1643719211,
+      "nodeId": "02fe677ac8cd61399d097535a3e8a51a0849e57cdbab9b34796c86f3e33568cbe2",
+      "serialized": "lnbcrt50u1pslj23tpp5u9cdkghhyeugfzus6ngsp90xsc78nguhzlxde743syrzfzunxpwqdq809hkcmcsp5tp7xegstgfpyjyg2cqclsthwr330g9g3p0dmn0g6v9t6dn6n9s4smqz9gxqrrsscqp79qtzsqqqqqysgq20s4qnk7xq0dcwjustztkx4ez0mqlmg83s5y6gk4u7ug6qk3cwuxq9ehqn4kyp580gqwp4nxwh598j40pqnlals2m0pem7f0qz0xm8qqe25z82",
+      "description": "#reckless",
+      "paymentHash": "e170db22f72678848b90d4d10095e6863c79a39717ccdcfab18106248b93305c",
+      "paymentMetadata": "2a",
+      "expiry": 3600,
+      "minFinalCltvExpiry": 30,
+      "amount": 5000000,
+      "features": {
+        "activated": {
+          "payment_secret": "mandatory",
+          "basic_mpp": "optional",
+          "option_payment_metadata": "optional",
+          "var_onion_optin": "mandatory"
+        },
+        "unknown": []
+      },
+      "routingInfo": []
+    },
+    "status": {
+      "type": "sent",
+      "paymentPreimage": "533b360e08d0d7383d0125e3510eaf5d7e36e21b847446cf64a84973800bc48c",
+      "feesPaid": 15,
+      "route": [
+        {
+          "nodeId": "03dfefbc942ac877655af00c4a6e9314626438e4aaba141412d825d5f2304bf0bf",
+          "nextNodeId": "02f5ce007d2d9ef8a72a03b8e33f63fe9384cea4e71c1de468737611ce3e68ac02",
+          "shortChannelId": "538x4x1"
+        },
+        {
+          "nodeId": "02f5ce007d2d9ef8a72a03b8e33f63fe9384cea4e71c1de468737611ce3e68ac02",
+          "nextNodeId": "02d150875194d076f662d4252a8dee7077ed4cc4a848bb9f83fb467b6d3c120199",
+          "shortChannelId": "538x2x1"
+        }
+      ],
+      "completedAt": {
+        "iso": "2022-02-01T12:40:19.438Z",
+        "unix": 1643719219
+      }
+    }
+  }
+]"""
+        val validGetReceivedInfoResponse = """{
+  "invoice": {
+    "prefix": "lnbcrt",
+    "timestamp": 1643719211,
+    "nodeId": "02fe677ac8cd61399d097535a3e8a51a0849e57cdbab9b34796c86f3e33568cbe2",
+    "serialized": "lnbcrt50u1pslj23tpp5u9cdkghhyeugfzus6ngsp90xsc78nguhzlxde743syrzfzunxpwqdq809hkcmcsp5tp7xegstgfpyjyg2cqclsthwr330g9g3p0dmn0g6v9t6dn6n9s4smqz9gxqrrsscqp79qtzsqqqqqysgq20s4qnk7xq0dcwjustztkx4ez0mqlmg83s5y6gk4u7ug6qk3cwuxq9ehqn4kyp580gqwp4nxwh598j40pqnlals2m0pem7f0qz0xm8qqe25z82",
+    "description": "#reckless",
+    "paymentHash": "e170db22f72678848b90d4d10095e6863c79a39717ccdcfab18106248b93305c",
+    "paymentMetadata": "2a",
+    "expiry": 3600,
+    "minFinalCltvExpiry": 30,
+    "amount": 5000000,
+    "features": {
+      "activated": {
+        "payment_secret": "mandatory",
+        "basic_mpp": "optional",
+        "option_payment_metadata": "optional",
+        "var_onion_optin": "mandatory"
+      },
+      "unknown": []
+    },
+    "routingInfo": []
+  },
+  "paymentPreimage": "533b360e08d0d7383d0125e3510eaf5d7e36e21b847446cf64a84973800bc48c",
+  "paymentType": "Standard",
+  "createdAt": {
+    "iso": "2022-02-01T12:40:11Z",
+    "unix": 1643719211
+  },
+  "status": {
+    "type": "received",
+    "amount": 5000000,
+    "receivedAt": {
+      "iso": "2022-02-01T12:40:19.423Z",
+      "unix": 1643719219
+    }
+  }
+}"""
+        val validListReceivedPaymentsResponse = """[
+  {
+    "invoice": {
+      "prefix": "lnbcrt",
+      "timestamp": 1686839336,
+      "nodeId": "02ca41676c9dfff08553528b151b1bf82031a26bb1d6f852e0f8075d33fa4ea089",
+      "serialized": "lnbcrt500u1pjgkgpgpp5qw2c953gwadm9zevstlq04ffl870tzmjdvg7c03x840xtcdkavgsdq809hkcmcsp5rvgyuy7hmtuc5ljmr645yfntrrwgyumnsp43w60xdrw9gnjprauqmqz9gxqrrsscqp79q7sqqqqqqqqqqqqqqqqqqqsqqqqqysgq7pwcsn9nfrvf46nkmctqnwuj3rvt7erx4494k4sa8uawajyz39sx8jd8t8l3kq4z3w653xu9uqvsjekyu478egx7ftwwzl2m8n7nqagqm7nqs9",
+      "description": "yolo",
+      "paymentHash": "039582d228775bb28b2c82fe07d529f9fcf58b726b11ec3e263d5e65e1b6eb11",
+      "paymentMetadata": "2a",
+      "expiry": 3600,
+      "minFinalCltvExpiry": 30,
+      "amount": 50000000,
+      "features": {
+        "activated": {
+          "trampoline_payment_prototype": "optional",
+          "payment_secret": "mandatory",
+          "basic_mpp": "optional",
+          "option_payment_metadata": "optional",
+          "var_onion_optin": "mandatory"
+        },
+        "unknown": []
+      },
+      "routingInfo": []
+    },
+    "paymentPreimage": "f3fcdefcd38481666f624ba68ca17ad620ca8c98bbec5f0616ba11ff11d6096e",
+    "paymentType": "Standard",
+    "createdAt": {
+      "iso": "2023-06-15T14:28:56Z",
+      "unix": 1686839336
+    },
+    "status": {
+      "type": "received",
+      "amount": 50000000,
+      "receivedAt": {
+        "iso": "2023-06-15T14:30:32.564Z",
+        "unix": 1686839432
+      }
+    }
+  },
+  {
+    "invoice": {
+      "prefix": "lnbcrt",
+      "timestamp": 1686839569,
+      "nodeId": "02ca41676c9dfff08553528b151b1bf82031a26bb1d6f852e0f8075d33fa4ea089",
+      "serialized": "lnbcrt100u1pjgkgg3pp529amjg068drrefp02mxz8907gdnea3jqn6fss7y4zw07uswr2w6sdq809hkcmcsp5njg0whsxvzuqtp5wpzsma0jhphch7r9z45yzjjpg500dpcdqw3csmqz9gxqrrsscqp79q7sqqqqqqqqqqqqqqqqqqqsqqqqqysgq629ldsmfufcerxkc562mh7dz5sr5x68zyhpxhg0qv6qfvhvv7w6yw0gtxqlyu4fw8kzrcd5etu24gy34dv276m3wmf8jfa069m3c4tqqx4dxns",
+      "description": "yolo",
+      "paymentHash": "517bb921fa3b463ca42f56cc2395fe43679ec6409e93087895139fee41c353b5",
+      "paymentMetadata": "2a",
+      "expiry": 3600,
+      "minFinalCltvExpiry": 30,
+      "amount": 10000000,
+      "features": {
+        "activated": {
+          "trampoline_payment_prototype": "optional",
+          "payment_secret": "mandatory",
+          "basic_mpp": "optional",
+          "option_payment_metadata": "optional",
+          "var_onion_optin": "mandatory"
+        },
+        "unknown": []
+      },
+      "routingInfo": []
+    },
+    "paymentPreimage": "8c13992095e5ad50ed6675b5f5e87e786fed3cd39209f8ced2e67fadf6567c7b",
+    "paymentType": "Standard",
+    "createdAt": {
+      "iso": "2023-06-15T14:32:49Z",
+      "unix": 1686839569
+    },
+    "status": {
+      "type": "received",
+      "amount": 10000000,
+      "receivedAt": {
+        "iso": "2023-06-15T14:32:57.631Z",
+        "unix": 1686839577
+      }
+    }
+  }
+]"""
+        val validGetInvoiceResponse = """{
+  "prefix": "lnbcrt",
+  "timestamp": 1643718891,
+  "nodeId": "028e2403fbfddb3d787843361f91adbda64c6f622921b19fb48f5766508bcadb29",
+  "serialized": "lnbcrt500n1pslj28tpp55kxmmddatrnmf42a55mk4wzz4ryq8tv2vwrrarj27e0hhjgpscjqdq0ydex2cmtd3jhxucsp5qu6jq5heq4lcjpj2r8gp0sd65860yzc5yw3xrwde6c4m3mlessxsmqz9gxqrrsscqp79qtzsqqqqqysgqr2fy2yz4655hwql2nwkk3t9saxhj80340cxfzf7fwhweasncv77ym7wcv0p54e4kt7jpmfdavnj5urq84syh9t2t49qdgj4ra8jl40gp6ys45n",
+  "description": "#reckless",
+  "paymentHash": "a58dbdb5bd58e7b4d55da5376ab842a8c803ad8a63863e8e4af65f7bc9018624",
+  "paymentMetadata": "2a",
+  "expiry": 3600,
+  "minFinalCltvExpiry": 30,
+  "amount": 50000,
+  "features": {
+    "activated": {
+      "payment_secret": "mandatory",
+      "basic_mpp": "optional",
+      "option_payment_metadata": "optional",
+      "var_onion_optin": "mandatory"
+    },
+    "unknown": []
+  },
+  "routingInfo": []
+}"""
+        val validListInvoicesResponse = """[
+  {
+    "prefix": "lnbcrt",
+    "timestamp": 1643719798,
+    "nodeId": "028e2403fbfddb3d787843361f91adbda64c6f622921b19fb48f5766508bcadb29",
+    "serialized": "lnbcrt1psljtrkpp5gqus3ys83p9cry4nj43ykjyvkuuhrcc5y45a6l569zwuc8pn2xxsdq0ydex2cmtd3jhxucsp543t76xycc9kpx4estwm6tjlpsht3m7d5jxe09tqnyjjux970y9lsmqz9gxqrrsscqp79qtzsqqqqqysgqxwh55ncvj3hv0cypm8vafku83gayzg7qa3zlu3lua76lk53t2m3rgt4d5qa04cfdd0f407p328c9el9xvy3r6z9um90m5pjaxrrazysqfkxfa7",
+    "description": "#reckless",
+    "paymentHash": "4039089207884b8192b395624b488cb73971e3142569dd7e9a289dcc1c33518d",
+    "paymentMetadata": "2a",
+    "expiry": 3600,
+    "minFinalCltvExpiry": 30,
+    "features": {
+      "activated": {
+        "payment_secret": "mandatory",
+        "basic_mpp": "optional",
+        "option_payment_metadata": "optional",
+        "var_onion_optin": "mandatory"
+      },
+      "unknown": []
+    },
+    "routingInfo": []
+  },
+  {
+    "prefix": "lnbcrt",
+    "timestamp": 1643719828,
+    "nodeId": "028e2403fbfddb3d787843361f91adbda64c6f622921b19fb48f5766508bcadb29",
+    "serialized": "lnbcrt1psljty5pp5z2247c5w8cl30err7s9qx8rkejltq49mk8z6l5eqar7l43pehapsdq0ydex2cmtd3jhxucsp5hrcu5s0jftrmje4yavu580tlrq4mdmdevye8aevn6dsae4x5kejqmqz9gxqrrsscqp79qtzsqqqqqysgqwus3au5085tp02cwvpjexc5rq6qjezwxwr3yecdxr525qprv5zjxa98r69kx87cegavjw9u9299yfdhnes7mp4dztttyduchudvq64cq4pyx28",
+    "description": "#reckless",
+    "paymentHash": "12955f628e3e3f17e463f40a031c76ccbeb054bbb1c5afd320e8fdfac439bf43",
+    "paymentMetadata": "2a",
+    "expiry": 3600,
+    "minFinalCltvExpiry": 30,
+    "features": {
+      "activated": {
+        "payment_secret": "mandatory",
+        "basic_mpp": "optional",
+        "option_payment_metadata": "optional",
+        "var_onion_optin": "mandatory"
+      },
+      "unknown": []
+    },
+    "routingInfo": []
+  }
+]"""
+        val validListPendingInvoicesResponse = """[
+  {
+    "prefix": "lnbcrt",
+    "timestamp": 1643719798,
+    "nodeId": "028e2403fbfddb3d787843361f91adbda64c6f622921b19fb48f5766508bcadb29",
+    "serialized": "lnbcrt1psljtrkpp5gqus3ys83p9cry4nj43ykjyvkuuhrcc5y45a6l569zwuc8pn2xxsdq0ydex2cmtd3jhxucsp543t76xycc9kpx4estwm6tjlpsht3m7d5jxe09tqnyjjux970y9lsmqz9gxqrrsscqp79qtzsqqqqqysgqxwh55ncvj3hv0cypm8vafku83gayzg7qa3zlu3lua76lk53t2m3rgt4d5qa04cfdd0f407p328c9el9xvy3r6z9um90m5pjaxrrazysqfkxfa7",
+    "description": "#reckless",
+    "paymentHash": "4039089207884b8192b395624b488cb73971e3142569dd7e9a289dcc1c33518d",
+    "paymentMetadata": "2a",
+    "expiry": 3600,
+    "minFinalCltvExpiry": 30,
+    "features": {
+      "activated": {
+        "payment_secret": "mandatory",
+        "basic_mpp": "optional",
+        "option_payment_metadata": "optional",
+        "var_onion_optin": "mandatory"
+      },
+      "unknown": []
+    },
+    "routingInfo": []
+  },
+  {
+    "prefix": "lnbcrt",
+    "timestamp": 1643719828,
+    "nodeId": "028e2403fbfddb3d787843361f91adbda64c6f622921b19fb48f5766508bcadb29",
+    "serialized": "lnbcrt1psljty5pp5z2247c5w8cl30err7s9qx8rkejltq49mk8z6l5eqar7l43pehapsdq0ydex2cmtd3jhxucsp5hrcu5s0jftrmje4yavu580tlrq4mdmdevye8aevn6dsae4x5kejqmqz9gxqrrsscqp79qtzsqqqqqysgqwus3au5085tp02cwvpjexc5rq6qjezwxwr3yecdxr525qprv5zjxa98r69kx87cegavjw9u9299yfdhnes7mp4dztttyduchudvq64cq4pyx28",
+    "description": "#reckless",
+    "paymentHash": "12955f628e3e3f17e463f40a031c76ccbeb054bbb1c5afd320e8fdfac439bf43",
+    "paymentMetadata": "2a",
+    "expiry": 3600,
+    "minFinalCltvExpiry": 30,
+    "features": {
+      "activated": {
+        "payment_secret": "mandatory",
+        "basic_mpp": "optional",
+        "option_payment_metadata": "optional",
+        "var_onion_optin": "mandatory"
+      },
+      "unknown": []
+    },
+    "routingInfo": []
+  }
+]"""
     }
 }
 
@@ -335,4 +817,63 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
     override suspend fun allchannels(): Either<ApiError, String> = Either.Left(error)
 
     override suspend fun allupdates(nodeId: String?): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun createinvoice(
+        description: String?,
+        descriptionHash: String?,
+        amountMsat: Int?,
+        expireIn: Int?,
+        fallbackAddress: String?,
+        paymentPreimage: String?
+    ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun parseinvoice(invoice: String): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun payinvoice(
+        invoice: String,
+        amountMsat: Int?,
+        maxAttempts: Int?,
+        maxFeeFlatSat: Int?,
+        maxFeePct: Int?,
+        externalId: String?,
+        pathFindingExperimentName: String?,
+        blocking: Boolean?
+    ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun sendtonode(
+        nodeId: String,
+        amountMsat: Int,
+        maxAttempts: Int?,
+        maxFeeFlatSat: Int?,
+        maxFeePct: Int?,
+        externalId: String?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun sendtoroute(
+        invoice: String,
+        nodeIds: List<String>?,
+        shortChannelIds: List<String>?,
+        amountMsat: Int,
+        paymentHash: String,
+        finalCltvExpiry: Int,
+        maxFeeMsat: Int?,
+        recipientAmountMsat: Int?,
+        parentId: String?,
+        externalId: String?
+    ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun getsentinfo(paymentHash: String, id: String?): Either<ApiError, String> =  Either.Left(error)
+
+    override suspend fun getreceivedinfo(paymentHash: String?, invoice: String?): Either<ApiError, String> =  Either.Left(error)
+
+    override suspend fun listreceivedpayments(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun getinvoice(paymentHash: String): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun listinvoices(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun listpendinginvoices(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> = Either.Left(error)
 }
