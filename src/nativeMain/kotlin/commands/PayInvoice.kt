@@ -2,8 +2,12 @@ package commands
 
 import IResultWriter
 import api.IEclairClientBuilder
+import arrow.core.Either
 import kotlinx.cli.ArgType
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
+import types.ApiError
 import types.InvoiceResult
 import types.Serialization
 
@@ -50,8 +54,12 @@ class PayInvoiceCommand(
 
     override fun execute() = runBlocking {
         val eclairClient = eclairClientBuilder.build(host, password)
-
-        val result = eclairClient.payinvoice(
+        val format = Json {
+            ignoreUnknownKeys = true
+            prettyPrint = true
+            isLenient = true
+        }
+        val response = eclairClient.payinvoice(
             invoice!!,
             amountMsat,
             maxAttempts,
@@ -60,13 +68,18 @@ class PayInvoiceCommand(
             externalId,
             pathFindingExperimentName,
             blocking
-        ).map { response ->
-            val result = if (response.length == 36) {
-                InvoiceResult(true, response)
-            } else {
-                InvoiceResult(false, response)
+        )
+
+        val result: Either<ApiError, String> = when (response) {
+            is Either.Left -> Either.Left(response.value)
+            is Either.Right -> {
+                try {
+                    val decoded = format.decodeFromString<String>(response.value)
+                    Either.Right(Serialization.encode(InvoiceResult(true, decoded)))
+                } catch (e: SerializationException) {
+                    Either.Left(ApiError(1, "API response could not be parsed: ${response.value}"))
+                }
             }
-            Serialization.encode(result)
         }
         resultWriter.write(result)
     }

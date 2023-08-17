@@ -102,7 +102,7 @@ data class Invoice(
     val paymentMetadata: String,
     val expiry: Int,
     val minFinalCltvExpiry: Int,
-    val amount: Long,
+    val amount: Long? = null,
     val features: Features,
     val routingInfo: List<@Contextual Any>
 ) : EclairApiType()
