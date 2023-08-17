@@ -32,7 +32,8 @@ class DummyEclairClient(
     private val listreceivedpaymentsResponse: String = validListReceivedPaymentsResponse,
     private val getinvoiceResponse: String = validGetInvoiceResponse,
     private val listinvoicesResponse: String = validListInvoicesResponse,
-    private val listpendinginvoicesResponse: String = validListPendingInvoicesResponse
+    private val listpendinginvoicesResponse: String = validListPendingInvoicesResponse,
+    private val findrouteResponse: String = validFindRouteResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -168,6 +169,17 @@ class DummyEclairClient(
         count: Int?,
         skip: Int?
     ): Either<ApiError, String> = Either.Right(listpendinginvoicesResponse)
+
+    override suspend fun findroute(
+        invoice: String,
+        amountMsat: Int?,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> = Either.Right(findrouteResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -756,6 +768,117 @@ class DummyEclairClient(
     "routingInfo": []
   }
 ]"""
+        val validFindRouteResponse = """{
+  "type": "types.FindRouteResponse",
+  "routes": [
+    {
+      "amount": 1000,
+      "hops": [
+        {
+          "nodeId": "03c5b161c16e9f8ef3f3bccfb74a6e9a3b423dd41fe2848174b7209f1c2ea25dad",
+          "nextNodeId": "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e",
+          "source": {
+            "type": "announcement",
+            "channelUpdate": {
+              "signature": "5d0b0155259727236f77947c87b30849ad7209dd17c6cd3ef5e53783df4ca9da4f53c2f9b687c6fc99f4c4bc8bfd7d2c719003c0fbd9b475b0e5978155716878",
+              "chainHash": "06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f",
+              "shortChannelId": "354x1x1",
+              "timestamp": {
+                "iso": "2023-08-12T12:16:57Z",
+                "unix": 1691842617
+              },
+              "messageFlags": {
+                "dontForward": false
+              },
+              "channelFlags": {
+                "isEnabled": true,
+                "isNode1": false
+              },
+              "cltvExpiryDelta": 144,
+              "htlcMinimumMsat": 1,
+              "feeBaseMsat": 7856,
+              "feeProportionalMillionths": 5679,
+              "htlcMaximumMsat": 45000000,
+              "tlvStream": {
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "amount": 1000,
+      "hops": [
+        {
+          "nodeId": "03c5b161c16e9f8ef3f3bccfb74a6e9a3b423dd41fe2848174b7209f1c2ea25dad",
+          "nextNodeId": "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e",
+          "source": {
+            "type": "announcement",
+            "channelUpdate": {
+              "signature": "4d9a50fdfb3d76ce47e26f75440295e1ecde91c1a67e14930bf657c5084e07b6403b0b8047d68c2b2bd765b27a3dc71fd434431881b7d863cf3283496f80bf24",
+              "chainHash": "06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f",
+              "shortChannelId": "252x2x1",
+              "timestamp": {
+                "iso": "2023-08-12T12:16:57Z",
+                "unix": 1691842617
+              },
+              "messageFlags": {
+                "dontForward": false
+              },
+              "channelFlags": {
+                "isEnabled": true,
+                "isNode1": false
+              },
+              "cltvExpiryDelta": 144,
+              "htlcMinimumMsat": 1,
+              "feeBaseMsat": 7856,
+              "feeProportionalMillionths": 5679,
+              "htlcMaximumMsat": 45000000,
+              "tlvStream": {
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "amount": 1000,
+      "hops": [
+        {
+          "nodeId": "03c5b161c16e9f8ef3f3bccfb74a6e9a3b423dd41fe2848174b7209f1c2ea25dad",
+          "nextNodeId": "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e",
+          "source": {
+            "type": "announcement",
+            "channelUpdate": {
+              "signature": "615fab66837d37f0fe9a949b97a6fadd37d42dcfd9adf325a7820880ca195666485d811dc00cdc2f11f98691500a88f77d4eb5179e35f594e7e68e3be71dc8ac",
+              "chainHash": "06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f",
+              "shortChannelId": "151x3x0",
+              "timestamp": {
+                "iso": "2023-08-12T12:16:57Z",
+                "unix": 1691842617
+              },
+              "messageFlags": {
+                "dontForward": false
+              },
+              "channelFlags": {
+                "isEnabled": true,
+                "isNode1": false
+              },
+              "cltvExpiryDelta": 144,
+              "htlcMinimumMsat": 1,
+              "feeBaseMsat": 7856,
+              "feeProportionalMillionths": 5679,
+              "htlcMaximumMsat": 45000000,
+              "tlvStream": {
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+"""
     }
 }
 
@@ -876,4 +999,15 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
     override suspend fun listinvoices(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> = Either.Left(error)
 
     override suspend fun listpendinginvoices(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun findroute(
+        invoice: String,
+        amountMsat: Int?,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> = Either.Left(error)
 }

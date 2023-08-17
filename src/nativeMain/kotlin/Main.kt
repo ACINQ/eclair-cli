@@ -19,7 +19,6 @@ fun main(args: Array<String>) {
         ForceCloseCommand(resultWriter, apiClientBuilder),
         UpdateRelayFeeCommand(resultWriter, apiClientBuilder),
         PeersCommand(resultWriter, apiClientBuilder),
-        UpdateRelayFeeCommand(resultWriter, apiClientBuilder),
         NodesCommand(resultWriter, apiClientBuilder),
         NodeCommand(resultWriter, apiClientBuilder),
         AllChannelsCommand(resultWriter, apiClientBuilder),
@@ -35,7 +34,8 @@ fun main(args: Array<String>) {
         ListReceivedPaymentsCommand(resultWriter, apiClientBuilder),
         GetInvoiceCommand(resultWriter, apiClientBuilder),
         ListInvoicesCommand(resultWriter, apiClientBuilder),
-        ListPendingInvoicesCommand(resultWriter, apiClientBuilder)
+        ListPendingInvoicesCommand(resultWriter, apiClientBuilder),
+        FindRouteCommand(resultWriter, apiClientBuilder),
     )
     parser.parse(args)
 }
