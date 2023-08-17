@@ -34,6 +34,7 @@ class DummyEclairClient(
     private val listinvoicesResponse: String = validListInvoicesResponse,
     private val listpendinginvoicesResponse: String = validListPendingInvoicesResponse,
     private val findrouteResponse: String = validFindRouteResponse,
+    private val findroutetonodeResponse: String = validFindRouteToNodeResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -180,6 +181,17 @@ class DummyEclairClient(
         includeLocalChannelCost: Boolean?,
         pathFindingExperimentName: String?
     ): Either<ApiError, String> = Either.Right(findrouteResponse)
+
+    override suspend fun findroutetonode(
+        nodeId: String,
+        amountMsat: Int,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> = Either.Right(findroutetonodeResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -879,6 +891,18 @@ class DummyEclairClient(
   ]
 }
 """
+        val validFindRouteToNodeResponse = """{
+  "routes": [
+    {
+      "amount": 5000,
+      "nodeIds": [
+        "036d65409c41ab7380a43448f257809e7496b52bf92057c09c4f300cbd61c50d96",
+        "03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f",
+        "03d06758583bb5154774a6eb221b1276c9e82d65bbaceca806d90e20c108f4b1c7"
+      ]
+    }
+  ]
+}"""
     }
 }
 
@@ -1003,6 +1027,17 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
     override suspend fun findroute(
         invoice: String,
         amountMsat: Int?,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun findroutetonode(
+        nodeId: String,
+        amountMsat: Int,
         ignoreNodeIds: List<String>?,
         ignoreShortChannelIds: List<String>?,
         format: String?,

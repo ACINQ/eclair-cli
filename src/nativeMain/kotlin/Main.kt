@@ -36,6 +36,7 @@ fun main(args: Array<String>) {
         ListInvoicesCommand(resultWriter, apiClientBuilder),
         ListPendingInvoicesCommand(resultWriter, apiClientBuilder),
         FindRouteCommand(resultWriter, apiClientBuilder),
+        FindRouteToNodeCommand(resultWriter, apiClientBuilder),
     )
     parser.parse(args)
 }
