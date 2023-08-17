@@ -131,6 +131,28 @@ interface IEclairClient {
         parentId: String?,
         externalId: String?
     ): Either<ApiError, String>
+
+    suspend fun getsentinfo(paymentHash: String, id: String?): Either<ApiError, String>
+
+    suspend fun getreceivedinfo(paymentHash: String?, invoice: String?): Either<ApiError, String>
+
+    suspend fun listreceivedpayments(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String>
+
+    suspend fun getinvoice(paymentHash: String): Either<ApiError, String>
+
+    suspend fun listinvoices(
+        from: Int?,
+        to: Int?,
+        count: Int?,
+        skip: Int?
+    ): Either<ApiError, String>
+
+    suspend fun listpendinginvoices(
+        from: Int?,
+        to: Int?,
+        count: Int?,
+        skip: Int?
+    ): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -603,6 +625,119 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                     recipientAmountMsat?.let { append("recipientAmountMsat", it.toString()) }
                     parentId?.let { append("parentId", it) }
                     externalId?.let { append("externalId", it) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun getsentinfo(paymentHash: String, id: String?): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/getsentinfo",
+                formParameters = Parameters.build {
+                    append("paymentHash", paymentHash)
+                    id?.let { append("id", it) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun getreceivedinfo(paymentHash: String?, invoice: String?): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/getreceivedinfo",
+                formParameters = Parameters.build {
+                    paymentHash?.let { append("paymentHash", it) }
+                    invoice?.let { append("invoice", it) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun listreceivedpayments(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/listreceivedpayments",
+                formParameters = Parameters.build {
+                    from?.let { append("from", it.toString()) }
+                    to?.let { append("to", it.toString()) }
+                    count?.let { append("count", it.toString()) }
+                    skip?.let { append("skip", it.toString()) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun getinvoice(paymentHash: String): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/getinvoice",
+                formParameters = Parameters.build {
+                    append("paymentHash", paymentHash)
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun listinvoices(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/listinvoices",
+                formParameters = Parameters.build {
+                    from?.let { append("from", it.toString()) }
+                    to?.let { append("to", it.toString()) }
+                    count?.let { append("count", it.toString()) }
+                    skip?.let { append("skip", it.toString()) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun listpendinginvoices(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/listpendinginvoices",
+                formParameters = Parameters.build {
+                    from?.let { append("from", it.toString()) }
+                    to?.let { append("to", it.toString()) }
+                    count?.let { append("count", it.toString()) }
+                    skip?.let { append("skip", it.toString()) }
                 }
             )
             when (response.status) {

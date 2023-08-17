@@ -118,3 +118,49 @@ data class RouteResult(
     val paymentId: String,
     val parentId: String
 ) : EclairApiType()
+
+@Serializable
+data class SentInfoResponse(
+    val id: String,
+    val parentId: String,
+    val paymentHash: String,
+    val paymentType: String,
+    val amount: Long,
+    val recipientAmount: Long,
+    val recipientNodeId: String,
+    val createdAt: Timestamp,
+    val invoice: Invoice,
+    val status: PaymentStatus
+)
+
+@Serializable
+data class PaymentStatus(
+    val type: String,
+    val paymentPreimage: String,
+    val feesPaid: Long,
+    val route: List<Route>,
+    val completedAt: Timestamp
+)
+
+@Serializable
+data class Route(
+    val nodeId: String,
+    val nextNodeId: String,
+    val shortChannelId: String
+)
+
+@Serializable
+data class ReceivedInfoResponse(
+    val invoice: Invoice,
+    val paymentPreimage: String,
+    val paymentType: String,
+    val createdAt: Timestamp,
+    val status: ReceivePaymentStatus
+) : EclairApiType()
+
+@Serializable
+data class ReceivePaymentStatus(
+    val type: String,
+    val amount: Long? = null,
+    val receivedAt: Timestamp? = null
+)

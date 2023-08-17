@@ -30,6 +30,12 @@ fun main(args: Array<String>) {
         PayInvoiceCommand(resultWriter, apiClientBuilder),
         SendToNodeCommand(resultWriter, apiClientBuilder),
         SendToRouteCommand(resultWriter, apiClientBuilder),
+        GetSentInfoCommand(resultWriter, apiClientBuilder),
+        GetReceivedInfoCommand(resultWriter, apiClientBuilder),
+        ListReceivedPaymentsCommand(resultWriter, apiClientBuilder),
+        GetInvoiceCommand(resultWriter, apiClientBuilder),
+        ListInvoicesCommand(resultWriter, apiClientBuilder),
+        ListPendingInvoicesCommand(resultWriter, apiClientBuilder)
     )
     parser.parse(args)
 }

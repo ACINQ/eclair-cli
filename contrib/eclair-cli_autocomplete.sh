@@ -19,7 +19,7 @@ _eclair_cli() {
     # `_init_completion` is a helper function provided by the Bash-completion package.
     _init_completion || return
 
-    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers nodes node allchannels allupdates createinvoice deleteinvoice parseinvoice payinvoice sendtonode sendtoroute"
+    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers nodes node allchannels allupdates createinvoice deleteinvoice parseinvoice payinvoice sendtonode sendtoroute getsentinfo getreceivedinfo listreceivedpayments getinvoice listinvoices listpendinginvoices"
     local common_opts="-p --host"
     local connect_opts="--uri --nodeId --address --port"
     local disconnect_opts="--nodeId"
@@ -38,6 +38,12 @@ _eclair_cli() {
     local payinvoice_opts="--invoice --amountMsat --maxAttempts --maxFeeFlatSat --maxFeePct --externalId --pathFindingExperimentName --blocking"
     local sendtonode_opts="--nodeId --amountMsat --maxAttempts --maxFeeFlatSat --maxFeePct --externalId --pathFindingExperimentName"
     local sendtoroute_opts="--invoice --nodeIds --shortChannelIds --amountMsat --paymentHash --finalCltvExpiry --maxFeeMsat --recipientAmountMsat --parentId --externalId"
+    local getsentinfo_opts="--paymentHash --id"
+    local getreceivedinfo_opts="--paymentHash --invoice"
+    local listreceivedpayments_opts="--from --to --count --skip"
+    local getinvoice_opts="--paymentHash"
+    local listinvoices_opts="--from --to --count --skip"
+    local listpendinginvoices_opts="--from --to --count --skip"
     	# If the current word starts with a dash (-), it's an option rather than a command
      if [[ ${cur} == -* ]]; then
         local cmd=""
@@ -101,6 +107,24 @@ _eclair_cli() {
                 ;;
             sendtoroute)
                 COMPREPLY=( $(compgen -W "${sendtoroute_opts} ${common_opts}" -- ${cur}) )
+                ;;
+            getsentinfo)
+                COMPREPLY=( $(compgen -W "${getsentinfo_opts} ${common_opts}" -- ${cur}) )
+                ;;
+            getreceivedinfo)
+                COMPREPLY=( $(compgen -W "${getreceivedinfo_opts} ${common_opts}" -- ${cur}) )
+                ;;
+            listreceivedpayments)
+                COMPREPLY=( $(compgen -W "${listreceivedpayments_opts} ${common_opts}" -- ${cur}) )
+                ;;
+            getinvoice)
+                COMPREPLY=( $(compgen -W "${getinvoice_opts} ${common_opts}" -- ${cur}) )
+                ;;
+            listinvoices)
+                COMPREPLY=( $(compgen -W "${listinvoices_opts} ${common_opts}" -- ${cur}) )
+                ;;
+            listpendinginvoices)
+                COMPREPLY=( $(compgen -W "${listpendinginvoices_opts} ${common_opts}" -- ${cur}) )
                 ;;
             *)
                 COMPREPLY=( $(compgen -W "${common_opts}" -- ${cur}) )
