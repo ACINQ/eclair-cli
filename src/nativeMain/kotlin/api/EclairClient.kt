@@ -76,6 +76,14 @@ interface IEclairClient {
     ): Either<ApiError, String>
 
     suspend fun peers(): Either<ApiError, String>
+
+    suspend fun nodes(nodeIds: List<String>?): Either<ApiError, String>
+
+    suspend fun node(nodeId: String): Either<ApiError, String>
+
+    suspend fun allchannels(): Either<ApiError, String>
+
+    suspend fun allupdates(nodeId: String?): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -329,6 +337,69 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
             }
         } catch (e: Throwable) {
             Either.Left(ApiError(0, e.message ?: "unknown exception"))
+        }
+    }
+
+    override suspend fun nodes(nodeIds: List<String>?): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/nodes",
+                formParameters = Parameters.build {
+                    nodeIds?.let { append("nodeIds", it.joinToString(",")) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun node(nodeId: String): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/node",
+                formParameters = Parameters.build {
+                    append("nodeId", nodeId)
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun allchannels(): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.post("$apiHost/allchannels")
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun allupdates(nodeId: String?): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/allupdates",
+                formParameters = Parameters.build {
+                    nodeId?.let { append("nodeId", it) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
         }
     }
 }

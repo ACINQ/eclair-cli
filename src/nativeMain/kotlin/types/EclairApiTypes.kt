@@ -1,5 +1,6 @@
 package types
 
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 data class ApiError(val code: Int, val message: String)
@@ -36,4 +37,56 @@ data class Peer(
     val state: String,
     val address: String? = null,
     val channels: Int
+)
+
+@Serializable
+data class Node(
+    val signature: String,
+    val features: Features,
+    val timestamp: Timestamp,
+    val nodeId: String,
+    val rgbColor: String,
+    val alias: String,
+    val addresses: List<String>,
+    val tlvStream: Map<String, @Contextual Any>
+)
+
+@Serializable
+data class Timestamp(
+    val iso: String,
+    val unix: Long
+)
+
+@Serializable
+data class NodeCommandResponse(
+    val announcement: Node
+) : EclairApiType()
+
+@Serializable
+data class AllChannels(
+    val shortChannelId: String,
+    val a: String,
+    val b: String
+)
+
+@Serializable
+data class AllUpdates(
+    val signature: String,
+    val chainHash: String,
+    val shortChannelId: String,
+    val timestamp: Timestamp,
+    val messageFlags: Map<String, Boolean>,
+    val channelFlags: ChannelFlags,
+    val cltvExpiryDelta: Int,
+    val htlcMinimumMsat: Int,
+    val feeBaseMsat: Int,
+    val feeProportionalMillionths: Int,
+    val htlcMaximumMsat: Long,
+    val tlvStream: Map<String, @Contextual Any>
+)
+
+@Serializable
+data class ChannelFlags(
+    val isEnabled: Boolean,
+    val isNode1: Boolean
 )

@@ -17,6 +17,10 @@ class DummyEclairClient(
     private val forcecloseResponse: String = validForceCloseResponse,
     private val updateRelayFeeResponse: String = validUpdateRelayFeeResponse,
     private val peersResponse: String = validPeersResponse,
+    private val nodesResponse: String = validNodesResponse,
+    private val nodeResponse: String = validNodeResponse,
+    private val allChannelsResponse: String = validAllChannelsResponse,
+    private val allUpdatesResponse: String = validAllUpdatesResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -68,6 +72,14 @@ class DummyEclairClient(
 
     override suspend fun peers(): Either<ApiError, String> = Either.Right(peersResponse)
 
+    override suspend fun nodes(nodeIds: List<String>?): Either<ApiError, String> = Either.Right(nodesResponse)
+
+    override suspend fun node(nodeId: String): Either<ApiError, String> = Either.Right(nodeResponse)
+
+    override suspend fun allchannels(): Either<ApiError, String> = Either.Right(allChannelsResponse)
+
+    override suspend fun allupdates(nodeId: String?): Either<ApiError, String> = Either.Right(allUpdatesResponse)
+
     companion object {
         val validGetInfoResponse =
             """{"version":"0.9.0","nodeId":"03e319aa4ecc7a89fb8b3feb6efe9075864b91048bff5bef14efd55a69760ddf17","alias":"alice","color":"#49daaa","features":{"activated":{"var_onion_optin":"mandatory","option_static_remotekey":"optional"},"unknown":[151,178]},"chainHash":"06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f","network":"regtest","blockHeight":107,"publicAddresses":[],"instanceId":"be74bd9a-fc54-4f24-bc41-0477c9ce2fb4"}"""
@@ -101,6 +113,166 @@ class DummyEclairClient(
       "state":"DISCONNECTED",
       "channels":1
    }
+]"""
+        val validNodesResponse = """[
+  {
+    "signature": "c466c08fa16c1810e2971de2a57ef1f9e5e13d36a224544cf0e3d621030b9e617652b88fb2024bfdc60066ca63b4f67504f154e8fee7f13bc39739b76cc4419f",
+    "features": {
+      "activated": {
+        "option_onion_messages": "optional",
+        "gossip_queries_ex": "optional",
+        "option_data_loss_protect": "optional",
+        "var_onion_optin": "mandatory",
+        "option_static_remotekey": "optional",
+        "option_support_large_channel": "optional",
+        "option_anchors_zero_fee_htlc_tx": "optional",
+        "payment_secret": "mandatory",
+        "option_shutdown_anysegwit": "optional",
+        "option_channel_type": "optional",
+        "basic_mpp": "optional",
+        "gossip_queries": "optional"
+      },
+      "unknown": []
+    },
+    "timestamp": {
+      "iso": "2022-02-01T12:27:19Z",
+      "unix": 1643718439
+    },
+    "nodeId": "028e2403fbfddb3d787843361f91adbda64c6f622921b19fb48f5766508bcadb29",
+    "rgbColor": "#49daaa",
+    "alias": "alice",
+    "addresses": [
+      "138.229.205.237:9735"
+    ],
+    "tlvStream": {}
+  },
+  {
+    "signature": "f6cce33383fe1291fa60cfa7d9efa4a45c081396e445e9cadc825ab695aab30308a68733d27fc54a5c46b888bdddd467f30f2f5441e95c2920b3b6c54decc3a1",
+    "features": {
+      "activated": {
+        "option_onion_messages": "optional",
+        "gossip_queries_ex": "optional",
+        "option_data_loss_protect": "optional",
+        "var_onion_optin": "mandatory",
+        "option_static_remotekey": "optional",
+        "option_support_large_channel": "optional",
+        "option_anchors_zero_fee_htlc_tx": "optional",
+        "payment_secret": "mandatory",
+        "option_shutdown_anysegwit": "optional",
+        "option_channel_type": "optional",
+        "basic_mpp": "optional",
+        "gossip_queries": "optional"
+      },
+      "unknown": []
+    },
+    "timestamp": {
+      "iso": "2022-02-01T12:27:19Z",
+      "unix": 1643718439
+    },
+    "nodeId": "02fe677ac8cd61399d097535a3e8a51a0849e57cdbab9b34796c86f3e33568cbe2",
+    "rgbColor": "#49daaa",
+    "alias": "bob",
+    "addresses": [
+      "95.216.16.21:9735",
+      "[2a01:4f9:2a:106a:0:0:0:2]:9736"
+    ],
+    "tlvStream": {}
+  }
+]"""
+        val validNodeResponse = """{
+  "type": "types.NodeCommandResponse",
+  "announcement": {
+    "signature": "327c3bd0933e98bd5e65d24e1e1f6aae310f8c1606544dba6cb587b95542d9111eb9abf0a34283ef007e04ed7b003bef3bdb74896a8e34fe86b0fb0734f7efc7",
+    "features": {
+      "activated": {
+        "gossip_queries_ex": "optional",
+        "option_data_loss_protect": "optional",
+        "var_onion_optin": "mandatory",
+        "option_static_remotekey": "optional",
+        "option_scid_alias": "optional",
+        "option_onion_messages": "optional",
+        "option_support_large_channel": "optional",
+        "option_anchors_zero_fee_htlc_tx": "optional",
+        "payment_secret": "mandatory",
+        "option_shutdown_anysegwit": "optional",
+        "option_channel_type": "optional",
+        "basic_mpp": "optional",
+        "gossip_queries": "optional"
+      },
+      "unknown": [
+      ]
+    },
+    "timestamp": {
+      "iso": "2023-08-14T10:27:13Z",
+      "unix": 1692008833
+    },
+    "nodeId": "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e",
+    "rgbColor": "#49daaa",
+    "alias": "bob",
+    "addresses": [
+    ],
+    "tlvStream": {
+    }
+  }
+}
+"""
+        val validAllChannelsResponse = """[
+  {
+    "shortChannelId": "508856x657x0",
+    "a": "0206c7b60457550f512d80ecdd9fb6eb798ce7e91bf6ec08ad9c53d72e94ef620d",
+    "b": "02f6725f9c1c40333b67faea92fd211c183050f28df32cac3f9d69685fe9665432"
+  },
+  {
+    "shortChannelId": "512733x303x0",
+    "a": "024bd94f0425590434538fd21d4e58982f7e9cfd8f339205a73deb9c0e0341f5bd",
+    "b": "02eae56f155bae8a8eaab82ddc6fef04d5a79a6b0b0d7bcdd0b60d52f3015af031"
+  }
+]"""
+        val validAllUpdatesResponse = """[
+  {
+    "signature": "02bbe4ee3f128ba044937428680d266c71231fd02d899c446aad498ca095610133f7c2ddb68ed0d8d29961d0962651556dc08b5cb00fb56055d2b98407f4addb",
+    "chainHash": "06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f",
+    "shortChannelId": "2899x1x1",
+    "timestamp": {
+      "iso": "2022-02-01T12:27:50Z",
+      "unix": 1643718470
+    },
+    "messageFlags": {
+      "dontForward": false
+    },
+    "channelFlags": {
+      "isEnabled": true,
+      "isNode1": true
+    },
+    "cltvExpiryDelta": 48,
+    "htlcMinimumMsat": 1,
+    "feeBaseMsat": 5,
+    "feeProportionalMillionths": 150,
+    "htlcMaximumMsat": 450000000,
+    "tlvStream": {}
+  },
+  {
+    "signature": "1da0e7094424c0daa64fe8427e191095d14285dd9346f37d014d07d8857b53cc6bed703d22794ddbfc1945cf5bdb7566137441964e01f8facc30c17fd0dffa06",
+    "chainHash": "06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f",
+    "shortChannelId": "2899x1x1",
+    "timestamp": {
+      "iso": "2022-02-01T12:27:19Z",
+      "unix": 1643718439
+    },
+    "messageFlags": {
+      "dontForward": false
+    },
+    "channelFlags": {
+      "isEnabled": false,
+      "isNode1": false
+    },
+    "cltvExpiryDelta": 48,
+    "htlcMinimumMsat": 1,
+    "feeBaseMsat": 1000,
+    "feeProportionalMillionths": 200,
+    "htlcMaximumMsat": 450000000,
+    "tlvStream": {}
+  }
 ]"""
     }
 }
@@ -155,4 +327,12 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
     ): Either<ApiError, String> = Either.Left(error)
 
     override suspend fun peers(): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun nodes(nodeIds: List<String>?): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun node(nodeId: String): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun allchannels(): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun allupdates(nodeId: String?): Either<ApiError, String> = Either.Left(error)
 }
