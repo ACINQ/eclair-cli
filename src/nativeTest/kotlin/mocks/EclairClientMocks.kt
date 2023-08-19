@@ -33,13 +33,21 @@ class DummyEclairClient(
     private val getinvoiceResponse: String = validGetInvoiceResponse,
     private val listinvoicesResponse: String = validListInvoicesResponse,
     private val listpendinginvoicesResponse: String = validListPendingInvoicesResponse,
-    private val findrouteResponse: String = validFindRouteResponse,
-    private val findroutetonodeResponse: String = validFindRouteToNodeResponse,
-    private val findroutebetweennodesResponse: String = validFindRouteBetweenNodesResponse,
+    private val findrouteResponseNodeId: String = validRouteResponseNodeId,
+    private val findrouteResponseShortChannelId: String = validRouteResponseShortChannelId,
+    private val findrouteResponseFull: String = validRouteResponseFull,
+    private val findroutetonodeResponseNodeId: String = validRouteResponseNodeId,
+    private val findroutetonodeResponseShortChannelId: String = validRouteResponseShortChannelId,
+    private val findroutetonodeResponseFull: String = validRouteResponseFull,
+    private val findroutebetweennodesResponseNodeId: String = validRouteResponseNodeId,
+    private val findroutebetweennodesResponseShortChannelId: String = validRouteResponseShortChannelId,
+    private val findroutebetweennodesResponseFull: String = validRouteResponseFull,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
-    override suspend fun connect(target: ConnectionTarget): Either<ApiError, String> = Either.Right(validConnectResponse)
+    override suspend fun connect(target: ConnectionTarget): Either<ApiError, String> =
+        Either.Right(validConnectResponse)
+
     override suspend fun rbfopen(
         channelId: String,
         targetFeerateSatByte: Int,
@@ -104,7 +112,8 @@ class DummyEclairClient(
         paymentPreimage: String?
     ): Either<ApiError, String> = Either.Right(createInvoiceResponse)
 
-    override suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String> = Either.Right(deleteInvoiceResponse)
+    override suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String> =
+        Either.Right(deleteInvoiceResponse)
 
     override suspend fun parseinvoice(invoice: String): Either<ApiError, String> = Either.Right(parseInvoiceResponse)
 
@@ -181,7 +190,14 @@ class DummyEclairClient(
         maxFeeMsat: Int?,
         includeLocalChannelCost: Boolean?,
         pathFindingExperimentName: String?
-    ): Either<ApiError, String> = Either.Right(findrouteResponse)
+    ): Either<ApiError, String> {
+        return when (format) {
+            "nodeId" -> Either.Right(findrouteResponseNodeId)
+            "shortChannelId" -> Either.Right(findrouteResponseShortChannelId)
+            "full" -> Either.Right(findrouteResponseFull)
+            else -> Either.Right(findrouteResponseNodeId)
+        }
+    }
 
     override suspend fun findroutetonode(
         nodeId: String,
@@ -192,7 +208,14 @@ class DummyEclairClient(
         maxFeeMsat: Int?,
         includeLocalChannelCost: Boolean?,
         pathFindingExperimentName: String?
-    ): Either<ApiError, String> = Either.Right(findroutetonodeResponse)
+    ): Either<ApiError, String> {
+        return when (format) {
+            "nodeId" -> Either.Right(findrouteResponseNodeId)
+            "shortChannelId" -> Either.Right(findrouteResponseShortChannelId)
+            "full" -> Either.Right(findrouteResponseFull)
+            else -> Either.Right(findrouteResponseNodeId)
+        }
+    }
 
     override suspend fun findroutebetweennodes(
         sourceNodeId: String,
@@ -204,7 +227,14 @@ class DummyEclairClient(
         maxFeeMsat: Int?,
         includeLocalChannelCost: Boolean?,
         pathFindingExperimentName: String?
-    ): Either<ApiError, String> = Either.Right(findroutebetweennodesResponse)
+    ): Either<ApiError, String> {
+        return when (format) {
+            "nodeId" -> Either.Right(findrouteResponseNodeId)
+            "shortChannelId" -> Either.Right(findrouteResponseShortChannelId)
+            "full" -> Either.Right(findrouteResponseFull)
+            else -> Either.Right(findrouteResponseNodeId)
+        }
+    }
 
     companion object {
         val validGetInfoResponse =
@@ -422,7 +452,8 @@ class DummyEclairClient(
   },
   "routingInfo": []
 }"""
-        val validDeleteInvoiceResponse = "deleted invoice 6f0864735283ca95eaf9c50ef77893f55ee3dd11cb90710cbbfb73f018798a68"
+        val validDeleteInvoiceResponse =
+            "deleted invoice 6f0864735283ca95eaf9c50ef77893f55ee3dd11cb90710cbbfb73f018798a68"
         val validParseInvoiceResponse = """{
   "prefix": "lnbcrt",
   "timestamp": 1643718891,
@@ -793,7 +824,31 @@ class DummyEclairClient(
     "routingInfo": []
   }
 ]"""
-        val validFindRouteResponse = """{
+        val validRouteResponseNodeId = """{
+  "routes": [
+    {
+      "amount": 5000,
+      "nodeIds": [
+        "036d65409c41ab7380a43448f257809e7496b52bf92057c09c4f300cbd61c50d96",
+        "03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f",
+        "03d06758583bb5154774a6eb221b1276c9e82d65bbaceca806d90e20c108f4b1c7"
+      ]
+    }
+  ]
+}"""
+        val validRouteResponseShortChannelId = """{
+  "routes": [
+    {
+      "amount": 5000,
+      "shortChannelIds": [
+        "11203x1x0",
+        "11203x7x5",
+        "11205x3x3"
+      ]
+    }
+  ]
+}"""
+        val validRouteResponseFull = """{
   "type": "types.FindRouteResponse",
   "routes": [
     {
@@ -904,30 +959,6 @@ class DummyEclairClient(
   ]
 }
 """
-        val validFindRouteToNodeResponse = """{
-  "routes": [
-    {
-      "amount": 5000,
-      "nodeIds": [
-        "036d65409c41ab7380a43448f257809e7496b52bf92057c09c4f300cbd61c50d96",
-        "03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f",
-        "03d06758583bb5154774a6eb221b1276c9e82d65bbaceca806d90e20c108f4b1c7"
-      ]
-    }
-  ]
-}"""
-        val validFindRouteBetweenNodesResponse = """{
-  "routes": [
-    {
-      "amount": 5000,
-      "nodeIds": [
-        "036d65409c41ab7380a43448f257809e7496b52bf92057c09c4f300cbd61c50d96",
-        "03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f",
-        "03d06758583bb5154774a6eb221b1276c9e82d65bbaceca806d90e20c108f4b1c7"
-      ]
-    }
-  ]
-}"""
     }
 }
 
@@ -1037,17 +1068,21 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
         externalId: String?
     ): Either<ApiError, String> = Either.Left(error)
 
-    override suspend fun getsentinfo(paymentHash: String, id: String?): Either<ApiError, String> =  Either.Left(error)
+    override suspend fun getsentinfo(paymentHash: String, id: String?): Either<ApiError, String> = Either.Left(error)
 
-    override suspend fun getreceivedinfo(paymentHash: String?, invoice: String?): Either<ApiError, String> =  Either.Left(error)
+    override suspend fun getreceivedinfo(paymentHash: String?, invoice: String?): Either<ApiError, String> =
+        Either.Left(error)
 
-    override suspend fun listreceivedpayments(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> = Either.Left(error)
+    override suspend fun listreceivedpayments(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> =
+        Either.Left(error)
 
     override suspend fun getinvoice(paymentHash: String): Either<ApiError, String> = Either.Left(error)
 
-    override suspend fun listinvoices(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> = Either.Left(error)
+    override suspend fun listinvoices(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> =
+        Either.Left(error)
 
-    override suspend fun listpendinginvoices(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> = Either.Left(error)
+    override suspend fun listpendinginvoices(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> =
+        Either.Left(error)
 
     override suspend fun findroute(
         invoice: String,
