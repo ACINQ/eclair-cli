@@ -164,3 +164,29 @@ data class ReceivePaymentStatus(
     val amount: Long? = null,
     val receivedAt: Timestamp? = null
 )
+
+@Serializable
+data class FindRouteResponse(
+    val routes: List<Routes>
+): EclairApiType()
+
+@Serializable
+data class Routes(
+    val amount: Int,
+    val nodeIds: List<String>? = null,
+    val shortChannelIds: List<String>? = null,
+    val hops: List<Hops>?=null
+)
+
+@Serializable
+data class Hops(
+    val nodeId: String,
+    val nextNodeId: String,
+    val source: Source,
+)
+
+@Serializable
+data class Source(
+    val type: String,
+    val channelUpdate: AllUpdates
+)

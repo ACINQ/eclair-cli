@@ -19,7 +19,7 @@ _eclair_cli() {
     # `_init_completion` is a helper function provided by the Bash-completion package.
     _init_completion || return
 
-    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers nodes node allchannels allupdates createinvoice deleteinvoice parseinvoice payinvoice sendtonode sendtoroute getsentinfo getreceivedinfo listreceivedpayments getinvoice listinvoices listpendinginvoices"
+    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers nodes node allchannels allupdates createinvoice deleteinvoice parseinvoice payinvoice sendtonode sendtoroute getsentinfo getreceivedinfo listreceivedpayments getinvoice listinvoices listpendinginvoices findroute findroutetonode findroutebetweennodes"
     local common_opts="-p --host"
     local connect_opts="--uri --nodeId --address --port"
     local disconnect_opts="--nodeId"
@@ -44,6 +44,9 @@ _eclair_cli() {
     local getinvoice_opts="--paymentHash"
     local listinvoices_opts="--from --to --count --skip"
     local listpendinginvoices_opts="--from --to --count --skip"
+    local findroute_opts="--invoice --amountMsat --ignoreNodeIds --ignoreShortChannelIds --format --maxFeeMsat --includeLocalChannelCost --pathFindingExperimentName"
+    local findroutetonode_opts="--nodeId --amountMsat --ignoreNodeIds --ignoreShortChannelIds --format --maxFeeMsat --includeLocalChannelCost --pathFindingExperimentName"
+    local findroutebetweennodes_opts="--sourceNodeId --targetNodeId --amountMsat --ignoreNodeIds --ignoreShortChannelIds --format --maxFeeMsat --includeLocalChannelCost --pathFindingExperimentName"
     	# If the current word starts with a dash (-), it's an option rather than a command
      if [[ ${cur} == -* ]]; then
         local cmd=""
@@ -126,6 +129,15 @@ _eclair_cli() {
             listpendinginvoices)
                 COMPREPLY=( $(compgen -W "${listpendinginvoices_opts} ${common_opts}" -- ${cur}) )
                 ;;
+            findroute)
+                COMPREPLY=( $(compgen -W "${findroute_opts} ${common_opts}" -- ${cur}) )
+                ;;
+            findroutetonode)
+                COMPREPLY=( $(compgen -W "${findroutetonode_opts} ${common_opts}" -- ${cur}) )
+                  ;;
+            findroutebetweennodes)
+                COMPREPLY=( $(compgen -W "${findroutebetweennodes_opts} ${common_opts}" -- ${cur}) )
+                  ;;
             *)
                 COMPREPLY=( $(compgen -W "${common_opts}" -- ${cur}) )
                 ;;

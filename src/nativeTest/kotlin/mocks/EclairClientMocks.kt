@@ -32,11 +32,22 @@ class DummyEclairClient(
     private val listreceivedpaymentsResponse: String = validListReceivedPaymentsResponse,
     private val getinvoiceResponse: String = validGetInvoiceResponse,
     private val listinvoicesResponse: String = validListInvoicesResponse,
-    private val listpendinginvoicesResponse: String = validListPendingInvoicesResponse
+    private val listpendinginvoicesResponse: String = validListPendingInvoicesResponse,
+    private val findrouteResponseNodeId: String = validRouteResponseNodeId,
+    private val findrouteResponseShortChannelId: String = validRouteResponseShortChannelId,
+    private val findrouteResponseFull: String = validRouteResponseFull,
+    private val findroutetonodeResponseNodeId: String = validRouteResponseNodeId,
+    private val findroutetonodeResponseShortChannelId: String = validRouteResponseShortChannelId,
+    private val findroutetonodeResponseFull: String = validRouteResponseFull,
+    private val findroutebetweennodesResponseNodeId: String = validRouteResponseNodeId,
+    private val findroutebetweennodesResponseShortChannelId: String = validRouteResponseShortChannelId,
+    private val findroutebetweennodesResponseFull: String = validRouteResponseFull,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
-    override suspend fun connect(target: ConnectionTarget): Either<ApiError, String> = Either.Right(validConnectResponse)
+    override suspend fun connect(target: ConnectionTarget): Either<ApiError, String> =
+        Either.Right(validConnectResponse)
+
     override suspend fun rbfopen(
         channelId: String,
         targetFeerateSatByte: Int,
@@ -101,7 +112,8 @@ class DummyEclairClient(
         paymentPreimage: String?
     ): Either<ApiError, String> = Either.Right(createInvoiceResponse)
 
-    override suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String> = Either.Right(deleteInvoiceResponse)
+    override suspend fun deleteinvoice(paymentHash: String): Either<ApiError, String> =
+        Either.Right(deleteInvoiceResponse)
 
     override suspend fun parseinvoice(invoice: String): Either<ApiError, String> = Either.Right(parseInvoiceResponse)
 
@@ -168,6 +180,61 @@ class DummyEclairClient(
         count: Int?,
         skip: Int?
     ): Either<ApiError, String> = Either.Right(listpendinginvoicesResponse)
+
+    override suspend fun findroute(
+        invoice: String,
+        amountMsat: Int?,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> {
+        return when (format) {
+            "nodeId" -> Either.Right(findrouteResponseNodeId)
+            "shortChannelId" -> Either.Right(findrouteResponseShortChannelId)
+            "full" -> Either.Right(findrouteResponseFull)
+            else -> Either.Right(findrouteResponseNodeId)
+        }
+    }
+
+    override suspend fun findroutetonode(
+        nodeId: String,
+        amountMsat: Int,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> {
+        return when (format) {
+            "nodeId" -> Either.Right(findrouteResponseNodeId)
+            "shortChannelId" -> Either.Right(findrouteResponseShortChannelId)
+            "full" -> Either.Right(findrouteResponseFull)
+            else -> Either.Right(findrouteResponseNodeId)
+        }
+    }
+
+    override suspend fun findroutebetweennodes(
+        sourceNodeId: String,
+        targetNodeId: String,
+        amountMsat: Int,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> {
+        return when (format) {
+            "nodeId" -> Either.Right(findrouteResponseNodeId)
+            "shortChannelId" -> Either.Right(findrouteResponseShortChannelId)
+            "full" -> Either.Right(findrouteResponseFull)
+            else -> Either.Right(findrouteResponseNodeId)
+        }
+    }
 
     companion object {
         val validGetInfoResponse =
@@ -385,7 +452,8 @@ class DummyEclairClient(
   },
   "routingInfo": []
 }"""
-        val validDeleteInvoiceResponse = "deleted invoice 6f0864735283ca95eaf9c50ef77893f55ee3dd11cb90710cbbfb73f018798a68"
+        val validDeleteInvoiceResponse =
+            "deleted invoice 6f0864735283ca95eaf9c50ef77893f55ee3dd11cb90710cbbfb73f018798a68"
         val validParseInvoiceResponse = """{
   "prefix": "lnbcrt",
   "timestamp": 1643718891,
@@ -756,6 +824,141 @@ class DummyEclairClient(
     "routingInfo": []
   }
 ]"""
+        val validRouteResponseNodeId = """{
+  "routes": [
+    {
+      "amount": 5000,
+      "nodeIds": [
+        "036d65409c41ab7380a43448f257809e7496b52bf92057c09c4f300cbd61c50d96",
+        "03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f",
+        "03d06758583bb5154774a6eb221b1276c9e82d65bbaceca806d90e20c108f4b1c7"
+      ]
+    }
+  ]
+}"""
+        val validRouteResponseShortChannelId = """{
+  "routes": [
+    {
+      "amount": 5000,
+      "shortChannelIds": [
+        "11203x1x0",
+        "11203x7x5",
+        "11205x3x3"
+      ]
+    }
+  ]
+}"""
+        val validRouteResponseFull = """{
+  "type": "types.FindRouteResponse",
+  "routes": [
+    {
+      "amount": 1000,
+      "hops": [
+        {
+          "nodeId": "03c5b161c16e9f8ef3f3bccfb74a6e9a3b423dd41fe2848174b7209f1c2ea25dad",
+          "nextNodeId": "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e",
+          "source": {
+            "type": "announcement",
+            "channelUpdate": {
+              "signature": "5d0b0155259727236f77947c87b30849ad7209dd17c6cd3ef5e53783df4ca9da4f53c2f9b687c6fc99f4c4bc8bfd7d2c719003c0fbd9b475b0e5978155716878",
+              "chainHash": "06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f",
+              "shortChannelId": "354x1x1",
+              "timestamp": {
+                "iso": "2023-08-12T12:16:57Z",
+                "unix": 1691842617
+              },
+              "messageFlags": {
+                "dontForward": false
+              },
+              "channelFlags": {
+                "isEnabled": true,
+                "isNode1": false
+              },
+              "cltvExpiryDelta": 144,
+              "htlcMinimumMsat": 1,
+              "feeBaseMsat": 7856,
+              "feeProportionalMillionths": 5679,
+              "htlcMaximumMsat": 45000000,
+              "tlvStream": {
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "amount": 1000,
+      "hops": [
+        {
+          "nodeId": "03c5b161c16e9f8ef3f3bccfb74a6e9a3b423dd41fe2848174b7209f1c2ea25dad",
+          "nextNodeId": "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e",
+          "source": {
+            "type": "announcement",
+            "channelUpdate": {
+              "signature": "4d9a50fdfb3d76ce47e26f75440295e1ecde91c1a67e14930bf657c5084e07b6403b0b8047d68c2b2bd765b27a3dc71fd434431881b7d863cf3283496f80bf24",
+              "chainHash": "06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f",
+              "shortChannelId": "252x2x1",
+              "timestamp": {
+                "iso": "2023-08-12T12:16:57Z",
+                "unix": 1691842617
+              },
+              "messageFlags": {
+                "dontForward": false
+              },
+              "channelFlags": {
+                "isEnabled": true,
+                "isNode1": false
+              },
+              "cltvExpiryDelta": 144,
+              "htlcMinimumMsat": 1,
+              "feeBaseMsat": 7856,
+              "feeProportionalMillionths": 5679,
+              "htlcMaximumMsat": 45000000,
+              "tlvStream": {
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "amount": 1000,
+      "hops": [
+        {
+          "nodeId": "03c5b161c16e9f8ef3f3bccfb74a6e9a3b423dd41fe2848174b7209f1c2ea25dad",
+          "nextNodeId": "02f666711319435b7905dd77d10c269d8d50c02668b975f526577167d370b50a3e",
+          "source": {
+            "type": "announcement",
+            "channelUpdate": {
+              "signature": "615fab66837d37f0fe9a949b97a6fadd37d42dcfd9adf325a7820880ca195666485d811dc00cdc2f11f98691500a88f77d4eb5179e35f594e7e68e3be71dc8ac",
+              "chainHash": "06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f",
+              "shortChannelId": "151x3x0",
+              "timestamp": {
+                "iso": "2023-08-12T12:16:57Z",
+                "unix": 1691842617
+              },
+              "messageFlags": {
+                "dontForward": false
+              },
+              "channelFlags": {
+                "isEnabled": true,
+                "isNode1": false
+              },
+              "cltvExpiryDelta": 144,
+              "htlcMinimumMsat": 1,
+              "feeBaseMsat": 7856,
+              "feeProportionalMillionths": 5679,
+              "htlcMaximumMsat": 45000000,
+              "tlvStream": {
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+"""
     }
 }
 
@@ -865,15 +1068,53 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
         externalId: String?
     ): Either<ApiError, String> = Either.Left(error)
 
-    override suspend fun getsentinfo(paymentHash: String, id: String?): Either<ApiError, String> =  Either.Left(error)
+    override suspend fun getsentinfo(paymentHash: String, id: String?): Either<ApiError, String> = Either.Left(error)
 
-    override suspend fun getreceivedinfo(paymentHash: String?, invoice: String?): Either<ApiError, String> =  Either.Left(error)
+    override suspend fun getreceivedinfo(paymentHash: String?, invoice: String?): Either<ApiError, String> =
+        Either.Left(error)
 
-    override suspend fun listreceivedpayments(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> = Either.Left(error)
+    override suspend fun listreceivedpayments(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> =
+        Either.Left(error)
 
     override suspend fun getinvoice(paymentHash: String): Either<ApiError, String> = Either.Left(error)
 
-    override suspend fun listinvoices(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> = Either.Left(error)
+    override suspend fun listinvoices(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> =
+        Either.Left(error)
 
-    override suspend fun listpendinginvoices(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> = Either.Left(error)
+    override suspend fun listpendinginvoices(from: Int?, to: Int?, count: Int?, skip: Int?): Either<ApiError, String> =
+        Either.Left(error)
+
+    override suspend fun findroute(
+        invoice: String,
+        amountMsat: Int?,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun findroutetonode(
+        nodeId: String,
+        amountMsat: Int,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun findroutebetweennodes(
+        sourceNodeId: String,
+        targetNodeId: String,
+        amountMsat: Int,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> = Either.Left(error)
 }
