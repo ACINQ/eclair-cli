@@ -190,3 +190,9 @@ data class Source(
     val type: String,
     val channelUpdate: AllUpdates
 )
+
+@Serializable
+data class GetNewAddressResult(
+    val success: Boolean,
+    val message: String
+): EclairApiType()

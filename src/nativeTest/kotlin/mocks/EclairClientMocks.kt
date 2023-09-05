@@ -36,12 +36,7 @@ class DummyEclairClient(
     private val findrouteResponseNodeId: String = validRouteResponseNodeId,
     private val findrouteResponseShortChannelId: String = validRouteResponseShortChannelId,
     private val findrouteResponseFull: String = validRouteResponseFull,
-    private val findroutetonodeResponseNodeId: String = validRouteResponseNodeId,
-    private val findroutetonodeResponseShortChannelId: String = validRouteResponseShortChannelId,
-    private val findroutetonodeResponseFull: String = validRouteResponseFull,
-    private val findroutebetweennodesResponseNodeId: String = validRouteResponseNodeId,
-    private val findroutebetweennodesResponseShortChannelId: String = validRouteResponseShortChannelId,
-    private val findroutebetweennodesResponseFull: String = validRouteResponseFull,
+    private val getnewaddressResponse: String = validGetNewAddressResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -235,6 +230,8 @@ class DummyEclairClient(
             else -> Either.Right(findrouteResponseNodeId)
         }
     }
+
+    override suspend fun getnewaddress(): Either<ApiError, String> = Either.Right(getnewaddressResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -959,6 +956,7 @@ class DummyEclairClient(
   ]
 }
 """
+        val validGetNewAddressResponse = "bcrt1qaq9azfugal9usaffv3cj89gpeq36xst9ms53xl"
     }
 }
 
@@ -1117,4 +1115,6 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
         includeLocalChannelCost: Boolean?,
         pathFindingExperimentName: String?
     ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun getnewaddress(): Either<ApiError, String> = Either.Left(error)
 }
