@@ -153,6 +153,49 @@ interface IEclairClient {
         count: Int?,
         skip: Int?
     ): Either<ApiError, String>
+
+    suspend fun findroute(
+        invoice: String,
+        amountMsat: Int?,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String>
+
+
+    suspend fun findroutetonode(
+        nodeId: String,
+        amountMsat: Int,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String>
+
+    suspend fun findroutebetweennodes(
+        sourceNodeId: String,
+        targetNodeId: String,
+        amountMsat: Int,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String>
+
+    suspend fun getnewaddress(): Either<ApiError, String>
+
+    suspend fun sendonchain(address: String, amountSatoshis: Int, confirmationTarget: Int): Either<ApiError, String>
+
+    suspend fun onchainbalance(): Either<ApiError, String>
+
+    suspend fun onchaintransactions(count: Int, skip: Int): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -738,6 +781,172 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                     to?.let { append("to", it.toString()) }
                     count?.let { append("count", it.toString()) }
                     skip?.let { append("skip", it.toString()) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun findroute(
+        invoice: String,
+        amountMsat: Int?,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/findroute",
+                formParameters = Parameters.build {
+                    append("invoice", invoice)
+                    amountMsat?.let { append("amountMsat", it.toString()) }
+                    ignoreNodeIds?.let { append("ignoreNodeIds", it.joinToString(",")) }
+                    ignoreShortChannelIds?.let { append("ignoreShortChannelIds", it.joinToString(",")) }
+                    format?.let { append("format", it) }
+                    maxFeeMsat?.let { append("maxFeeMsat", it.toString()) }
+                    includeLocalChannelCost?.let { append("includeLocalChannelCost", it.toString()) }
+                    pathFindingExperimentName?.let { append("pathFindingExperimentName", it) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun findroutetonode(
+        nodeId: String,
+        amountMsat: Int,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/findroutetonode",
+                formParameters = Parameters.build {
+                    append("nodeId", nodeId)
+                    append("amountMsat", amountMsat.toString())
+                    ignoreNodeIds?.let { append("ignoreNodeIds", it.joinToString(",")) }
+                    ignoreShortChannelIds?.let { append("ignoreShortChannelIds", it.joinToString(",")) }
+                    format?.let { append("format", it) }
+                    maxFeeMsat?.let { append("maxFeeMsat", it.toString()) }
+                    includeLocalChannelCost?.let { append("includeLocalChannelCost", it.toString()) }
+                    pathFindingExperimentName?.let { append("pathFindingExperimentName", it) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun findroutebetweennodes(
+        sourceNodeId: String,
+        targetNodeId: String,
+        amountMsat: Int,
+        ignoreNodeIds: List<String>?,
+        ignoreShortChannelIds: List<String>?,
+        format: String?,
+        maxFeeMsat: Int?,
+        includeLocalChannelCost: Boolean?,
+        pathFindingExperimentName: String?
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/findroutebetweennodes",
+                formParameters = Parameters.build {
+                    append("sourceNodeId", sourceNodeId)
+                    append("targetNodeId", targetNodeId)
+                    append("amountMsat", amountMsat.toString())
+                    ignoreNodeIds?.let { append("ignoreNodeIds", it.joinToString(",")) }
+                    ignoreShortChannelIds?.let { append("ignoreShortChannelIds", it.joinToString(",")) }
+                    format?.let { append("format", it) }
+                    maxFeeMsat?.let { append("maxFeeMsat", it.toString()) }
+                    includeLocalChannelCost?.let { append("includeLocalChannelCost", it.toString()) }
+                    pathFindingExperimentName?.let { append("pathFindingExperimentName", it) }
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun getnewaddress(): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.post("$apiHost/getnewaddress")
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(response.bodyAsText())
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "unknown exception"))
+        }
+    }
+
+    override suspend fun sendonchain(
+        address: String,
+        amountSatoshis: Int,
+        confirmationTarget: Int
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/sendonchain",
+                formParameters = Parameters.build {
+                    append("address", address)
+                    append("amountSatoshis", amountSatoshis.toString())
+                    append("confirmationTarget", confirmationTarget.toString())
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "unknown exception"))
+        }
+    }
+
+    override suspend fun onchainbalance(): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.post("$apiHost/onchainbalance")
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(response.bodyAsText())
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "unknown exception"))
+        }
+    }
+
+    override suspend fun onchaintransactions(count: Int, skip: Int): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/onchaintransactions",
+                formParameters = Parameters.build {
+                    append("count", count.toString())
+                    append("skip", skip.toString())
                 }
             )
             when (response.status) {

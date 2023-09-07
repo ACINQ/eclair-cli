@@ -164,3 +164,58 @@ data class ReceivePaymentStatus(
     val amount: Long? = null,
     val receivedAt: Timestamp? = null
 )
+
+@Serializable
+data class FindRouteResponse(
+    val routes: List<Routes>
+): EclairApiType()
+
+@Serializable
+data class Routes(
+    val amount: Int,
+    val nodeIds: List<String>? = null,
+    val shortChannelIds: List<String>? = null,
+    val hops: List<Hops>?=null
+)
+
+@Serializable
+data class Hops(
+    val nodeId: String,
+    val nextNodeId: String,
+    val source: Source,
+)
+
+@Serializable
+data class Source(
+    val type: String,
+    val channelUpdate: AllUpdates
+)
+
+@Serializable
+data class GetNewAddressResult(
+    val success: Boolean,
+    val message: String
+): EclairApiType()
+
+@Serializable
+data class SendOnChainResult(
+    val success: Boolean,
+    val message: String
+): EclairApiType()
+
+@Serializable
+data class OnChainBalance(
+    val confirmed: Long,
+    val unconfirmed: Long
+): EclairApiType()
+
+@Serializable
+data class OnChainTransaction(
+    val address: String,
+    val amount: Int,
+    val fees: Int,
+    val blockHash: String,
+    val confirmations: Int,
+    val txid: String,
+    val timestamp: Long
+)
