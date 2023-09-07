@@ -37,6 +37,7 @@ class DummyEclairClient(
     private val findrouteResponseShortChannelId: String = validRouteResponseShortChannelId,
     private val findrouteResponseFull: String = validRouteResponseFull,
     private val getnewaddressResponse: String = validGetNewAddressResponse,
+    private val sendonchainResponse: String = validSendOnChainResponse
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -232,6 +233,12 @@ class DummyEclairClient(
     }
 
     override suspend fun getnewaddress(): Either<ApiError, String> = Either.Right(getnewaddressResponse)
+
+    override suspend fun sendonchain(
+        address: String,
+        amountSatoshis: Int,
+        confirmationTarget: Int
+    ): Either<ApiError, String> = Either.Right(sendonchainResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -957,6 +964,7 @@ class DummyEclairClient(
 }
 """
         val validGetNewAddressResponse = "bcrt1qaq9azfugal9usaffv3cj89gpeq36xst9ms53xl"
+        val validSendOnChainResponse = "d19c45509b2e39c92f2f84a6e07fab95509f5c1959e98f3085c66dc148582751"
     }
 }
 
@@ -1117,4 +1125,10 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
     ): Either<ApiError, String> = Either.Left(error)
 
     override suspend fun getnewaddress(): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun sendonchain(
+        address: String,
+        amountSatoshis: Int,
+        confirmationTarget: Int
+    ): Either<ApiError, String> = Either.Left(error)
 }

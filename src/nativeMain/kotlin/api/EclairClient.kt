@@ -190,6 +190,8 @@ interface IEclairClient {
     ): Either<ApiError, String>
 
     suspend fun getnewaddress(): Either<ApiError, String>
+
+    suspend fun sendonchain(address: String, amountSatoshis: Int, confirmationTarget: Int): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -887,11 +889,34 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
         }
     }
 
-    override suspend fun getnewaddress(): Either<ApiError, String>  {
+    override suspend fun getnewaddress(): Either<ApiError, String> {
         return try {
             val response: HttpResponse = httpClient.post("$apiHost/getnewaddress")
             when (response.status) {
                 HttpStatusCode.OK -> Either.Right(response.bodyAsText())
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "unknown exception"))
+        }
+    }
+
+    override suspend fun sendonchain(
+        address: String,
+        amountSatoshis: Int,
+        confirmationTarget: Int
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/sendonchain",
+                formParameters = Parameters.build {
+                    append("address", address)
+                    append("amountSatoshis", amountSatoshis.toString())
+                    append("confirmationTarget", confirmationTarget.toString())
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right(Json.decodeFromString(response.bodyAsText()))
                 else -> Either.Left(convertHttpError(response.status))
             }
         } catch (e: Throwable) {

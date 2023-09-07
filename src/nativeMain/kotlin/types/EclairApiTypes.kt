@@ -196,3 +196,9 @@ data class GetNewAddressResult(
     val success: Boolean,
     val message: String
 ): EclairApiType()
+
+@Serializable
+data class SendOnChainResult(
+    val success: Boolean,
+    val message: String
+): EclairApiType()

@@ -19,7 +19,7 @@ _eclair_cli() {
     # `_init_completion` is a helper function provided by the Bash-completion package.
     _init_completion || return
 
-    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers nodes node allchannels allupdates createinvoice deleteinvoice parseinvoice payinvoice sendtonode sendtoroute getsentinfo getreceivedinfo listreceivedpayments getinvoice listinvoices listpendinginvoices findroute findroutetonode findroutebetweennodes getnewaddress"
+    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers nodes node allchannels allupdates createinvoice deleteinvoice parseinvoice payinvoice sendtonode sendtoroute getsentinfo getreceivedinfo listreceivedpayments getinvoice listinvoices listpendinginvoices findroute findroutetonode findroutebetweennodes getnewaddress sendonchain"
     local common_opts="-p --host"
     local connect_opts="--uri --nodeId --address --port"
     local disconnect_opts="--nodeId"
@@ -47,6 +47,7 @@ _eclair_cli() {
     local findroute_opts="--invoice --amountMsat --ignoreNodeIds --ignoreShortChannelIds --format --maxFeeMsat --includeLocalChannelCost --pathFindingExperimentName"
     local findroutetonode_opts="--nodeId --amountMsat --ignoreNodeIds --ignoreShortChannelIds --format --maxFeeMsat --includeLocalChannelCost --pathFindingExperimentName"
     local findroutebetweennodes_opts="--sourceNodeId --targetNodeId --amountMsat --ignoreNodeIds --ignoreShortChannelIds --format --maxFeeMsat --includeLocalChannelCost --pathFindingExperimentName"
+    local sendonchain_opts="--address --amountSatoshis --confirmationTarget"
     	# If the current word starts with a dash (-), it's an option rather than a command
      if [[ ${cur} == -* ]]; then
         local cmd=""
@@ -138,6 +139,8 @@ _eclair_cli() {
             findroutebetweennodes)
                 COMPREPLY=( $(compgen -W "${findroutebetweennodes_opts} ${common_opts}" -- ${cur}) )
                   ;;
+            sendonchain)
+                COMPREPLY=( $(compgen -W "${sendonchain_opts} ${common_opts}" -- ${cur}) )
             *)
                 COMPREPLY=( $(compgen -W "${common_opts}" -- ${cur}) )
                 ;;

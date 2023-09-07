@@ -39,6 +39,7 @@ fun main(args: Array<String>) {
         FindRouteToNodeCommand(resultWriter, apiClientBuilder),
         FindRouteBetweenNodesCommand(resultWriter, apiClientBuilder),
         GetNewAddressCommand(resultWriter, apiClientBuilder),
+        SendOnChainCommand(resultWriter, apiClientBuilder),
     )
     parser.parse(args)
 }
