@@ -202,3 +202,9 @@ data class SendOnChainResult(
     val success: Boolean,
     val message: String
 ): EclairApiType()
+
+@Serializable
+data class OnChainBalance(
+    val confirmed: Long,
+    val unconfirmed: Long
+): EclairApiType()

@@ -37,7 +37,8 @@ class DummyEclairClient(
     private val findrouteResponseShortChannelId: String = validRouteResponseShortChannelId,
     private val findrouteResponseFull: String = validRouteResponseFull,
     private val getnewaddressResponse: String = validGetNewAddressResponse,
-    private val sendonchainResponse: String = validSendOnChainResponse
+    private val sendonchainResponse: String = validSendOnChainResponse,
+    private val onchainbalanceResponse: String = validOnChainBalanceResponse
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -239,6 +240,8 @@ class DummyEclairClient(
         amountSatoshis: Int,
         confirmationTarget: Int
     ): Either<ApiError, String> = Either.Right(sendonchainResponse)
+
+    override suspend fun onchainbalance(): Either<ApiError, String> = Either.Right(onchainbalanceResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -965,6 +968,11 @@ class DummyEclairClient(
 """
         val validGetNewAddressResponse = "bcrt1qaq9azfugal9usaffv3cj89gpeq36xst9ms53xl"
         val validSendOnChainResponse = "d19c45509b2e39c92f2f84a6e07fab95509f5c1959e98f3085c66dc148582751"
+        val validOnChainBalanceResponse = """{
+  "confirmed": 1304986456540,
+  "unconfirmed": 0
+}
+"""
     }
 }
 
@@ -1131,4 +1139,6 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
         amountSatoshis: Int,
         confirmationTarget: Int
     ): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun onchainbalance(): Either<ApiError, String> = Either.Left(error)
 }

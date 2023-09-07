@@ -19,7 +19,7 @@ _eclair_cli() {
     # `_init_completion` is a helper function provided by the Bash-completion package.
     _init_completion || return
 
-    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers nodes node allchannels allupdates createinvoice deleteinvoice parseinvoice payinvoice sendtonode sendtoroute getsentinfo getreceivedinfo listreceivedpayments getinvoice listinvoices listpendinginvoices findroute findroutetonode findroutebetweennodes getnewaddress sendonchain"
+    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers nodes node allchannels allupdates createinvoice deleteinvoice parseinvoice payinvoice sendtonode sendtoroute getsentinfo getreceivedinfo listreceivedpayments getinvoice listinvoices listpendinginvoices findroute findroutetonode findroutebetweennodes getnewaddress sendonchain onchainbalance"
     local common_opts="-p --host"
     local connect_opts="--uri --nodeId --address --port"
     local disconnect_opts="--nodeId"
