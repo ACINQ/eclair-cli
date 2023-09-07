@@ -40,7 +40,8 @@ fun main(args: Array<String>) {
         FindRouteBetweenNodesCommand(resultWriter, apiClientBuilder),
         GetNewAddressCommand(resultWriter, apiClientBuilder),
         SendOnChainCommand(resultWriter, apiClientBuilder),
-        OnChainBalanceCommand(resultWriter, apiClientBuilder)
+        OnChainBalanceCommand(resultWriter, apiClientBuilder),
+        OnChainTransactionsCommand(resultWriter, apiClientBuilder)
     )
     parser.parse(args)
 }

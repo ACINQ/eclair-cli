@@ -208,3 +208,14 @@ data class OnChainBalance(
     val confirmed: Long,
     val unconfirmed: Long
 ): EclairApiType()
+
+@Serializable
+data class OnChainTransaction(
+    val address: String,
+    val amount: Int,
+    val fees: Int,
+    val blockHash: String,
+    val confirmations: Int,
+    val txid: String,
+    val timestamp: Long
+)

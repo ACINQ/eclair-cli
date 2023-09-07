@@ -38,7 +38,8 @@ class DummyEclairClient(
     private val findrouteResponseFull: String = validRouteResponseFull,
     private val getnewaddressResponse: String = validGetNewAddressResponse,
     private val sendonchainResponse: String = validSendOnChainResponse,
-    private val onchainbalanceResponse: String = validOnChainBalanceResponse
+    private val onchainbalanceResponse: String = validOnChainBalanceResponse,
+    private val onchaintransactionsResponse: String = validOnChainTransactionsResponse,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -242,6 +243,9 @@ class DummyEclairClient(
     ): Either<ApiError, String> = Either.Right(sendonchainResponse)
 
     override suspend fun onchainbalance(): Either<ApiError, String> = Either.Right(onchainbalanceResponse)
+
+    override suspend fun onchaintransactions(count: Int, skip: Int): Either<ApiError, String> =
+        Either.Right(onchaintransactionsResponse)
 
     companion object {
         val validGetInfoResponse =
@@ -973,6 +977,26 @@ class DummyEclairClient(
   "unconfirmed": 0
 }
 """
+        val validOnChainTransactionsResponse = """[
+  {
+    "address": "2NEDjKwa56LFcFVjPefuwkN3pyABkMrqpJn",
+    "amount": 25000,
+    "fees": 0,
+    "blockHash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "confirmations": 0,
+    "txid": "d19c45509b2e39c92f2f84a6e07fab95509f5c1959e98f3085c66dc148582751",
+    "timestamp": 1593700112
+  },
+  {
+    "address": "2NEDjKwa56LFcFVjPefuwkN3pyABkMrqpJn",
+    "amount": 625000000,
+    "fees": 0,
+    "blockHash": "3f66e75bb70c1bc28edda9456fcf96ac68f10053020bee39f4cd45c240a1f05d",
+    "confirmations": 1,
+    "txid": "467e0f4c1fed9db56760e7bdcedb335c6b649fdaa82f51da80481a1101a98329",
+    "timestamp": 1593698170
+  }
+]"""
     }
 }
 
@@ -1141,4 +1165,6 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
     ): Either<ApiError, String> = Either.Left(error)
 
     override suspend fun onchainbalance(): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun onchaintransactions(count: Int, skip: Int): Either<ApiError, String> = Either.Left(error)
 }
