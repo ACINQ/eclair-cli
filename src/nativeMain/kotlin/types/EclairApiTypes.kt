@@ -219,3 +219,15 @@ data class OnChainTransaction(
     val txid: String,
     val timestamp: Long
 )
+
+@Serializable
+data class SendOnionMessageResult(
+    val sent: Boolean,
+    val response: Response? = null,
+    val failureMessage: String? = null
+): EclairApiType()
+
+@Serializable
+data class Response(
+    val unknownTlvs: Map<String, String>
+)

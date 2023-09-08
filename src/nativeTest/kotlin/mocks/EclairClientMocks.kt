@@ -40,6 +40,7 @@ class DummyEclairClient(
     private val sendonchainResponse: String = validSendOnChainResponse,
     private val onchainbalanceResponse: String = validOnChainBalanceResponse,
     private val onchaintransactionsResponse: String = validOnChainTransactionsResponse,
+    private val sendonionmessageSuccessWithReplyPath: String = validSendOnionMessageWithReplyPath,
 ) : IEclairClient, IEclairClientBuilder {
     override fun build(apiHost: String, apiPassword: String): IEclairClient = this
     override suspend fun getInfo(): Either<ApiError, String> = Either.Right(getInfoResponse)
@@ -246,6 +247,14 @@ class DummyEclairClient(
 
     override suspend fun onchaintransactions(count: Int, skip: Int): Either<ApiError, String> =
         Either.Right(onchaintransactionsResponse)
+
+    override suspend fun sendonionmessage(
+        content: String,
+        recipientNode: String?,
+        recipientBlindedRoute: String?,
+        intermediateNodes: List<String>?,
+        replyPath: List<String>?
+    ): Either<ApiError, String> = Either.Right(sendonionmessageSuccessWithReplyPath)
 
     companion object {
         val validGetInfoResponse =
@@ -997,6 +1006,14 @@ class DummyEclairClient(
     "timestamp": 1593698170
   }
 ]"""
+        val validSendOnionMessageWithReplyPath = """{
+  "sent": true,
+  "response": {
+    "unknownTlvs": {
+      "211": "deadbeef"
+    }
+  }
+}"""
     }
 }
 
@@ -1167,4 +1184,12 @@ class FailingEclairClient(private val error: ApiError) : IEclairClient, IEclairC
     override suspend fun onchainbalance(): Either<ApiError, String> = Either.Left(error)
 
     override suspend fun onchaintransactions(count: Int, skip: Int): Either<ApiError, String> = Either.Left(error)
+
+    override suspend fun sendonionmessage(
+        content: String,
+        recipientNode: String?,
+        recipientBlindedRoute: String?,
+        intermediateNodes: List<String>?,
+        replyPath: List<String>?
+    ): Either<ApiError, String> = Either.Left(error)
 }

@@ -196,6 +196,14 @@ interface IEclairClient {
     suspend fun onchainbalance(): Either<ApiError, String>
 
     suspend fun onchaintransactions(count: Int, skip: Int): Either<ApiError, String>
+
+    suspend fun sendonionmessage(
+        content: String,
+        recipientNode: String?,
+        recipientBlindedRoute: String?,
+        intermediateNodes: List<String>?,
+        replyPath: List<String>?
+    ): Either<ApiError, String>
 }
 
 class EclairClient(private val apiHost: String, private val apiPassword: String) : IEclairClient {
@@ -947,6 +955,33 @@ class EclairClient(private val apiHost: String, private val apiPassword: String)
                 formParameters = Parameters.build {
                     append("count", count.toString())
                     append("skip", skip.toString())
+                }
+            )
+            when (response.status) {
+                HttpStatusCode.OK -> Either.Right((response.bodyAsText()))
+                else -> Either.Left(convertHttpError(response.status))
+            }
+        } catch (e: Throwable) {
+            Either.Left(ApiError(0, e.message ?: "Unknown exception"))
+        }
+    }
+
+    override suspend fun sendonionmessage(
+        content: String,
+        recipientNode: String?,
+        recipientBlindedRoute: String?,
+        intermediateNodes: List<String>?,
+        replyPath: List<String>?
+    ): Either<ApiError, String> {
+        return try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$apiHost/sendonionmessage",
+                formParameters = Parameters.build {
+                    append("content", content)
+                    recipientNode?.let { append("recipientNode", it) }
+                    recipientBlindedRoute?.let { append("recipientBlindedRoute", it) }
+                    intermediateNodes?.let { append("intermediateNodes", it.joinToString(",")) }
+                    replyPath?.let { append("replyPath", it.joinToString(",")) }
                 }
             )
             when (response.status) {

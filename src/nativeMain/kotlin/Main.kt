@@ -41,7 +41,8 @@ fun main(args: Array<String>) {
         GetNewAddressCommand(resultWriter, apiClientBuilder),
         SendOnChainCommand(resultWriter, apiClientBuilder),
         OnChainBalanceCommand(resultWriter, apiClientBuilder),
-        OnChainTransactionsCommand(resultWriter, apiClientBuilder)
+        OnChainTransactionsCommand(resultWriter, apiClientBuilder),
+        SendOnionMessageCommand(resultWriter, apiClientBuilder)
     )
     parser.parse(args)
 }

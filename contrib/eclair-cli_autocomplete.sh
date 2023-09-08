@@ -19,7 +19,7 @@ _eclair_cli() {
     # `_init_completion` is a helper function provided by the Bash-completion package.
     _init_completion || return
 
-    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers nodes node allchannels allupdates createinvoice deleteinvoice parseinvoice payinvoice sendtonode sendtoroute getsentinfo getreceivedinfo listreceivedpayments getinvoice listinvoices listpendinginvoices findroute findroutetonode findroutebetweennodes getnewaddress sendonchain onchainbalance onchaintransactions"
+    local commands="getinfo connect disconnect open rbfopen cpfpbumpfees close forceclose updaterelayfee peers nodes node allchannels allupdates createinvoice deleteinvoice parseinvoice payinvoice sendtonode sendtoroute getsentinfo getreceivedinfo listreceivedpayments getinvoice listinvoices listpendinginvoices findroute findroutetonode findroutebetweennodes getnewaddress sendonchain onchainbalance onchaintransactions sendonionmessage"
     local common_opts="-p --host"
     local connect_opts="--uri --nodeId --address --port"
     local disconnect_opts="--nodeId"
@@ -49,6 +49,7 @@ _eclair_cli() {
     local findroutebetweennodes_opts="--sourceNodeId --targetNodeId --amountMsat --ignoreNodeIds --ignoreShortChannelIds --format --maxFeeMsat --includeLocalChannelCost --pathFindingExperimentName"
     local sendonchain_opts="--address --amountSatoshis --confirmationTarget"
     local onchaintransactions_opts="--count --skip"
+    local sendonionmessage_opts="--content --recipientNode --recipientBlindedRoute --intermediateNodes --replyPath"
     	# If the current word starts with a dash (-), it's an option rather than a command
      if [[ ${cur} == -* ]]; then
         local cmd=""
@@ -145,6 +146,9 @@ _eclair_cli() {
                 ;;
             onchaintransactions)
                 COMPREPLY=( $(compgen -W "${onchaintransactions_opts} ${common_opts}" -- ${cur}) )
+                ;;
+            sendonionmessage)
+                COMPREPLY=( $(compgen -W "${sendonionmessage_opts} ${common_opts}" -- ${cur}) )
                 ;;
             *)
                 COMPREPLY=( $(compgen -W "${common_opts}" -- ${cur}) )
